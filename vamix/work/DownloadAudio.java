@@ -37,6 +37,10 @@ public class DownloadAudio extends SwingWorker<Integer, String> {
 		downloadFrame.setSize(200, 200);
 		downloadFrame.setVisible(true);
 		frame.add(downloadFrame);
+		downloadFrame.setLocation(30, 30);
+		 try {
+		        downloadFrame.setSelected(true);
+		 } catch (java.beans.PropertyVetoException e) {}
 		
 		dlBtn = new JButton("Download");
 		downloadFrame.add(dlBtn);
