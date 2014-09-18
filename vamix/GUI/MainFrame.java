@@ -4,13 +4,15 @@ import java.lang.*;
 import javax.swing.*;
 import javax.swing.SwingUtilities;
 
-//import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 
 public class MainFrame extends JFrame
 {
 	private JMenuBar menuBar;
     private JMenu menu1,menu2;
     private JMenuItem item1,item2;
+
+    private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 
 	public MainFrame()
 	{
@@ -38,5 +40,9 @@ public class MainFrame extends JFrame
         menu2.add(item2);
 
         setJMenuBar(menuBar);
+
+        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+        add(mediaPlayerComponent);
+        mediaPlayerComponent.getMediaPlayer().startMedia("bbb_sunflower_1080p_60fps_stereo_abl.mp4");
 	}
 }
