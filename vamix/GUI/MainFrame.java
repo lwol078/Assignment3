@@ -46,6 +46,13 @@ public class MainFrame extends JFrame implements ActionListener
 
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         add(mediaPlayerComponent);
+
+        JDesktopPane jDP = new JDesktopPane();
+        JFrame jframe = new JFrame();
+        setContentPane(jDP);
+        jDP.add(jframe);
+        jframe.setVisible(true);
+
 	}
 
     public void actionPerformed(ActionEvent e)
