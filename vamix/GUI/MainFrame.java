@@ -1,20 +1,22 @@
 package vamix.GUI;
 
 import java.lang.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.SwingUtilities;
 
+import vamix.work.*;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 
-public class MainFrame extends JFrame
+public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
     private JMenu menu1,menu2;
-    private JMenuItem item1,item2;
+    private JMenuItem openItem,item2;
 
     private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 
-	public MainFrame()
+	public MainFrame() 
 	{
 		super("Vamix - Title");
 		setLocation(100, 100);
@@ -33,8 +35,9 @@ public class MainFrame extends JFrame
             "Look, a submenu!");
         menu1.add(menu2);
 
-        item1 = new JMenuItem("Look, an item!");
-        menu1.add(item1);
+        openItem = new JMenuItem("Open");
+        openItem.addActionListener(this);
+        menu1.add(openItem);
 
         item2 = new JMenuItem("How exciting, I'm in a submenu!");
         menu2.add(item2);
@@ -45,4 +48,12 @@ public class MainFrame extends JFrame
         add(mediaPlayerComponent);
         mediaPlayerComponent.getMediaPlayer().startMedia("bbb_sunflower_1080p_60fps_stereo_abl.mp4");
 	}
+
+    public void actionPerformed(ActionEvent e)
+    { 
+        if(e.getSource() == openItem)
+        {
+            new OpenCommand(mediaPlayerComponent);
+        }
+    }
 }

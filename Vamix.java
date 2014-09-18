@@ -9,7 +9,6 @@ public class Vamix
             @Override
             public void run() {
                 MainFrame mainFrame =new MainFrame();
-                mainFrame.setVisible(true);
             }
         });
     }
