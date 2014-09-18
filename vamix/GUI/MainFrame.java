@@ -46,7 +46,6 @@ public class MainFrame extends JFrame implements ActionListener
 
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         add(mediaPlayerComponent);
-        mediaPlayerComponent.getMediaPlayer().startMedia("bbb_sunflower_1080p_60fps_stereo_abl.mp4");
 	}
 
     public void actionPerformed(ActionEvent e)
