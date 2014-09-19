@@ -26,7 +26,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
-public class DownloadAudio implements ActionListener {
+public class DownloadVideo implements ActionListener {
 
 	JFrame frame;
 	JInternalFrame downloadFrame;
@@ -34,15 +34,15 @@ public class DownloadAudio implements ActionListener {
 	JProgressBar progressBar;
 	JButton dlBtn;
 	JButton cancelDlBtn;
-	private DownloadAudioWorker worker;
+	private DownloadVideoWorker worker;
 	private int status;
 	private String fileName;
 	private String urlString;
 
-	public DownloadAudio(JFrame frame) {
+	public DownloadVideo(JFrame frame) {
 		frame = frame;
 
-		downloadFrame = new JInternalFrame("Download Audio", true, true);
+		downloadFrame = new JInternalFrame("Download Video", true, true);
 		downloadFrame.setSize(600, 400);
 		downloadFrame.setVisible(true);
 		GridBagLayout layout = new GridBagLayout();
@@ -55,7 +55,7 @@ public class DownloadAudio implements ActionListener {
 			downloadFrame.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}
 		
-		JLabel dlLabel = new JLabel("Enter URL of audio to download here:");
+		JLabel dlLabel = new JLabel("Enter URL of video to download here:");
 		c.weightx = 0.3;
 		c.ipadx = 0;
 		c.gridx = 0;
@@ -88,7 +88,7 @@ public class DownloadAudio implements ActionListener {
 
 	public void SetUpDownload() {
 		
-		worker = new DownloadAudioWorker();
+		worker = new DownloadVideoWorker();
 		urlString = url.getText();
 		fileName = urlString.substring( urlString.lastIndexOf('/')+1, urlString.length() );
 		
@@ -149,7 +149,7 @@ public class DownloadAudio implements ActionListener {
 		}
 	}
 	
-	class DownloadAudioWorker extends SwingWorker<Integer, String> {
+	class DownloadVideoWorker extends SwingWorker<Integer, String> {
 		
 		@Override
 		protected Integer doInBackground() {
