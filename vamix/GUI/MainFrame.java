@@ -15,7 +15,7 @@ public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
     private JMenu menu1,menu2,downloadMenu;
-    private JMenuItem openItem,item2, downloadAudio;
+    private JMenuItem openItem,item2, downloadAudio, downloadVideo;
     private JDesktopPane desktop;
     private JPanel playerPanel;
 
@@ -65,6 +65,10 @@ public class MainFrame extends JFrame implements ActionListener
         downloadAudio = new JMenuItem("Download Audio");
         downloadAudio.addActionListener(this);
         downloadMenu.add(downloadAudio);
+        
+        downloadVideo = new JMenuItem("Download Video");
+        downloadVideo.addActionListener(this);
+        downloadMenu.add(downloadVideo);
 
         setJMenuBar(menuBar);
 
@@ -86,6 +90,10 @@ public class MainFrame extends JFrame implements ActionListener
         else if (e.getSource() == downloadAudio)
         {
         	new DownloadAudio(this);
+        } 
+        else if (e.getSource() == downloadVideo)
+        {
+        	new DownloadVideo(this);
         }
     }
 }
