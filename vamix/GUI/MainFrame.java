@@ -36,8 +36,7 @@ public class MainFrame extends JFrame implements ActionListener
                     int height = (int)d.getHeight();
                     playerPanel.setBounds(0, 0, width, height-60);
                     playOptionsPanel.setBounds(0, height-80, width, 60);
-                    desktop.moveToFront( playOptionsPanel);
-                    desktop.moveToFront( menuBar);
+                    desktop.moveToBack( playerPanel);
                 }
             });
 
