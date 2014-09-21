@@ -3,6 +3,7 @@ package vamix.GUI;
 import java.lang.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 
 import javax.swing.*;
 
@@ -15,18 +16,37 @@ public class MainFrame extends JFrame implements ActionListener
     private JMenu menu1,menu2,downloadMenu;
     private JMenuItem openItem,item2, downloadAudio, downloadVideo;
     private JDesktopPane desktop;
-    private JPanel playerPanel, playOptionsPanel;
+    private JPanel playerPanel;
+    private PlayOptionsPanel playOptionsPanel;
 
     private EmbeddedMediaPlayerComponent mediaPlayerComponent;
+    private File currentFile;
 
 	public MainFrame() 
 	{
 		super("Vamix - Title");
+
+        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
+        currentFile = null;
+
 		setLocation(100, 100);
         setSize(1050, 600);
         setMinimumSize(new Dimension(100,100));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+        addWindowListener(new WindowListener()
+            {
+                public void windowClosing(WindowEvent e)
+                {
+                    mediaPlayerComponent.release();
+                }
+                public void windowActivated(WindowEvent e){}
+                public void windowDeactivated(WindowEvent e){}
+                public void windowDeiconified(WindowEvent e){}
+                public void windowIconified(WindowEvent e){}
+                public void windowClosed(WindowEvent e){}
+                public void windowOpened(WindowEvent e){}
+            });
         addComponentListener(new ComponentAdapter()
             {
                 public void componentResized(ComponentEvent e)
@@ -35,7 +55,7 @@ public class MainFrame extends JFrame implements ActionListener
                     int width = (int)d.getWidth();
                     int height = (int)d.getHeight();
                     playerPanel.setBounds(0, 0, width, height-60);
-                    playOptionsPanel.setBounds(0, height-80, width, 60);
+                    playOptionsPanel.setBounds(0, height-60, width, 40);
                     desktop.moveToBack( playerPanel);
                 }
             });
@@ -52,15 +72,8 @@ public class MainFrame extends JFrame implements ActionListener
         desktop.setLayer( playerPanel, JDesktopPane.DEFAULT_LAYER);
         desktop.add(playerPanel);
 
-        playOptionsPanel = new JPanel();
-        playOptionsPanel.setLayout(new BorderLayout());
-        playOptionsPanel.setVisible(true);
-        JButton btn1 = new JButton("Play");
-        btn1.setPreferredSize(new Dimension(100,60));
-        playOptionsPanel.add(btn1,BorderLayout.WEST);
-        Canvas canvas = new Canvas();
-        canvas.setBackground(Color.green);
-        playOptionsPanel.add(canvas,BorderLayout.CENTER);
+        playOptionsPanel = new PlayOptionsPanel(mediaPlayerComponent);
+        
         desktop.setLayer( playOptionsPanel, JDesktopPane.DEFAULT_LAYER);
         desktop.add(playOptionsPanel);
 
@@ -97,8 +110,6 @@ public class MainFrame extends JFrame implements ActionListener
 
         setJMenuBar(menuBar);
 
-        mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-
         Canvas player = new Canvas();
         player.setBackground(Color.black);
         player.setVisible(true);
@@ -110,7 +121,8 @@ public class MainFrame extends JFrame implements ActionListener
     { 
         if(e.getSource() == openItem)
         {
-            new OpenCommand(mediaPlayerComponent);
+            OpenCommand open = new OpenCommand(mediaPlayerComponent);
+            currentFile = open.Execute();
         }
         else if (e.getSource() == downloadAudio)
         {
