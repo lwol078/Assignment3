@@ -40,7 +40,7 @@ public class DownloadVideo implements ActionListener {
 	private String urlString;
 
 	public DownloadVideo(JFrame frame) {
-		frame = frame;
+		this.frame = frame;
 
 		downloadFrame = new JInternalFrame("Download Video", true, true);
 		downloadFrame.setSize(600, 400);

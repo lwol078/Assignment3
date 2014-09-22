@@ -40,7 +40,7 @@ public class DownloadAudio implements ActionListener {
 	private String urlString;
 
 	public DownloadAudio(JFrame frame) {
-		frame = frame;
+		this.frame = frame;
 
 		downloadFrame = new JInternalFrame("Download Audio", true, true);
 		downloadFrame.setSize(600, 400);

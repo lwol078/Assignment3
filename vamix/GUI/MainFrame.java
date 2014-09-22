@@ -13,8 +13,8 @@ import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
-    private JMenu menu1,menu2,downloadMenu;
-    private JMenuItem openItem,item2, downloadAudio, downloadVideo;
+    private JMenu menu1,menu2,downloadMenu, audioMenu;
+    private JMenuItem openItem,item2, downloadAudio, downloadVideo, extractAudio;
     private JDesktopPane desktop;
     private JPanel playerPanel;
     private PlayOptionsPanel playOptionsPanel;
@@ -107,6 +107,15 @@ public class MainFrame extends JFrame implements ActionListener
         downloadVideo = new JMenuItem("Download Video");
         downloadVideo.addActionListener(this);
         downloadMenu.add(downloadVideo);
+        
+        audioMenu = new JMenu("Audio");
+        audioMenu.getAccessibleContext().setAccessibleDescription(
+                "Menu option for audio functionality");
+        menuBar.add(audioMenu);
+        
+        extractAudio = new JMenuItem("Extract Audio from Video File");
+        extractAudio.addActionListener(this);
+        audioMenu.add(extractAudio);
 
         setJMenuBar(menuBar);
 
@@ -132,6 +141,9 @@ public class MainFrame extends JFrame implements ActionListener
         {
         	new DownloadVideo(this);
         }
-
+        else if (e.getSource() == extractAudio)
+        {
+        	new ExtractAudio(this);
+        }
     }
 }
