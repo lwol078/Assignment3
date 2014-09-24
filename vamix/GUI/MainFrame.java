@@ -13,8 +13,10 @@ import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
+
     private JMenu menu1,textMenu,downloadMenu, audioMenu;
-    private JMenuItem openItem,textItem, downloadAudio, downloadVideo, extractAudio;
+    private JMenuItem openItem,textItem, downloadAudio, downloadVideo, extractAudio, replaceAudio, overlayAudio;
+
     private JDesktopPane desktop;
     private JPanel playerPanel;
     private PlayOptionsPanel playOptionsPanel;
@@ -125,7 +127,14 @@ public class MainFrame extends JFrame implements ActionListener
         extractAudio = new JMenuItem("Extract Audio from Video File");
         extractAudio.addActionListener(this);
         audioMenu.add(extractAudio);
-
+        
+        replaceAudio = new JMenuItem("Replace Audio Track of Video");
+        replaceAudio.addActionListener(this);
+        audioMenu.add(replaceAudio);
+        
+        overlayAudio = new JMenuItem("Overlay Audio Track to Video");
+        overlayAudio.addActionListener(this);
+        audioMenu.add(overlayAudio);
         setJMenuBar(menuBar);
 
         Canvas player = new Canvas();
@@ -144,15 +153,23 @@ public class MainFrame extends JFrame implements ActionListener
         }
         else if (e.getSource() == downloadAudio)
         {
-        	new DownloadAudio(this);
+        	new DownloadAudioGUI(this);
         } 
         else if (e.getSource() == downloadVideo)
         {
-        	new DownloadVideo(this);
+        	new DownloadVideoGUI(this);
         }
         else if (e.getSource() == extractAudio)
         {
-        	new ExtractAudio(this);
+        	new ExtractAudioGUI(this);
+        }
+        else if (e.getSource() == replaceAudio) 
+        {
+        	new ReplaceAudioGUI(this);
+        }
+        else if (e.getSource() == overlayAudio) 
+        {
+        	new OverlayAudioGUI(this);
         }
         else if (e.getSource() == textItem)
         {
