@@ -1,4 +1,4 @@
-package vamix.work;
+package vamix.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -26,7 +26,9 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
-public class DownloadAudio implements ActionListener {
+import vamix.work.DownloadWorker;
+
+public class DownloadAudioGUI implements ActionListener, DownloadGUI {
 
 	JFrame frame;
 	JInternalFrame downloadFrame;
@@ -34,12 +36,12 @@ public class DownloadAudio implements ActionListener {
 	JProgressBar progressBar;
 	JButton dlBtn;
 	JButton cancelDlBtn;
-	private DownloadAudioWorker worker;
+	private DownloadWorker worker;
 	private int status;
 	private String fileName;
 	private String urlString;
 
-	public DownloadAudio(JFrame frame) {
+	public DownloadAudioGUI(JFrame frame) {
 		this.frame = frame;
 
 		downloadFrame = new JInternalFrame("Download Audio", true, true);
@@ -88,7 +90,7 @@ public class DownloadAudio implements ActionListener {
 
 	public void SetUpDownload() {
 		
-		worker = new DownloadAudioWorker();
+		worker = new DownloadWorker(this, url.getText());
 		urlString = url.getText();
 		fileName = urlString.substring( urlString.lastIndexOf('/')+1, urlString.length() );
 		
@@ -149,85 +151,24 @@ public class DownloadAudio implements ActionListener {
 		}
 	}
 	
-	class DownloadAudioWorker extends SwingWorker<Integer, String> {
-		
-		@Override
-		protected Integer doInBackground() {
-			try {
-
-				ProcessBuilder builder;
-				builder = new ProcessBuilder("wget", "--progress=dot", url.getText());
-
-				Process process = builder.start();
-
-				InputStream out = process.getInputStream();
-				InputStream err = process.getErrorStream();
-				BufferedReader stdout = new BufferedReader(new InputStreamReader(out));
-				BufferedReader stderr = new BufferedReader(new InputStreamReader(err));
-
-
-				String line = null;
-				while ((line = stderr.readLine()) != null) {
-					if (isCancelled()) {
-						process.destroy();
-						publish("0%");
-						break;
-					}
-					publish(line);
-				}
-
-				process.waitFor();
-				status = process.exitValue();
-				process.destroy();
-
-			} catch (Exception ex) {
-
-			}
-
-			return status;
+	public void downloadDone(int exitStatus) {
+		progressBar.setValue(progressBar.getMinimum());
+		if (exitStatus == 0) {
+			JOptionPane.showMessageDialog(downloadFrame, "Download of " + fileName + " completed successfuly");
+		} else {
+			JOptionPane.showMessageDialog(downloadFrame, "An error occurred during download, please ensure to enter a valid url");
 		}
-
-		protected void process(List<String> chunks) {
-			String[] chunksSplit = chunks.get(0).split(" ");
-			for (String i : chunksSplit) {
-				if (i.contains("%")) {
-					i = i.replaceAll("\\%", "");
-					int progress = Integer.parseInt(i);
-					progressBar.setValue(progress);
-				}
-			}
-		}
-
-		@Override
-		protected void done() {
-			try {
-				int exitStatus = get();
-				progressBar.setValue(progressBar.getMinimum());
-				if (exitStatus == 0) {
-					JOptionPane.showMessageDialog(downloadFrame, "Download of " + fileName + " completed successfuly");
-					//				createLogFile();
-					//				Date date = new Date();
-					//				String toLog = logLineCount() + " DOWNLOAD " + dt.format(date) + "\n";
-					//				try (BufferedWriter writer = Files.newBufferedWriter(logPath, charset, StandardOpenOption.APPEND)) {
-					//					writer.write(toLog, 0, toLog.length());
-					//				} catch (IOException x) {
-					//
-					//				}
-				} else {
-					JOptionPane.showMessageDialog(downloadFrame, "An error occurred during download, please ensure to enter a valid url"/*wgetExitMessage(exitStatus)*/);
-				}
-				fileName = "";
-				downloadFrame.remove(progressBar);
-				downloadFrame.remove(cancelDlBtn);
-				downloadFrame.validate();
-				downloadFrame.repaint();
-				dlBtn.setEnabled(true);
-			} catch (Exception ex) {
-
-			}
-		}
+		fileName = "";
+		downloadFrame.remove(progressBar);
+		downloadFrame.remove(cancelDlBtn);
+		downloadFrame.validate();
+		downloadFrame.repaint();
+		dlBtn.setEnabled(true);
 	}
 
-	
-
+	@Override
+	public void setProgressBar(int progress) {
+		progressBar.setValue(progress);
+		
+	}
 }
