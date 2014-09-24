@@ -14,7 +14,7 @@ public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
     private JMenu menu1,menu2,downloadMenu, audioMenu;
-    private JMenuItem openItem,item2, downloadAudio, downloadVideo, extractAudio;
+    private JMenuItem openItem,item2, downloadAudio, downloadVideo, extractAudio, replaceAudio;
     private JDesktopPane desktop;
     private JPanel playerPanel;
     private PlayOptionsPanel playOptionsPanel;
@@ -116,6 +116,10 @@ public class MainFrame extends JFrame implements ActionListener
         extractAudio = new JMenuItem("Extract Audio from Video File");
         extractAudio.addActionListener(this);
         audioMenu.add(extractAudio);
+        
+        replaceAudio = new JMenuItem("Replace Audio Track of Video");
+        replaceAudio.addActionListener(this);
+        audioMenu.add(replaceAudio);
 
         setJMenuBar(menuBar);
 
@@ -144,6 +148,10 @@ public class MainFrame extends JFrame implements ActionListener
         else if (e.getSource() == extractAudio)
         {
         	new ExtractAudio(this);
+        }
+        else if (e.getSource() == replaceAudio) 
+        {
+        	new ReplaceAudio(this);
         }
     }
 }

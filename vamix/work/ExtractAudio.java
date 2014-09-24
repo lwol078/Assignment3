@@ -120,7 +120,7 @@ public class ExtractAudio implements ActionListener {
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				extractFile = chooser.getSelectedFile();
 				try {
-					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + extractFile +" 2>&1 | grep -q -w Audio:" );
+					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + extractFile.toString() + "\"" + " 2>&1 | grep -q -w Audio:" );
 					Process process = builder.start();
 					process.waitFor();
 					int exitStatus = process.exitValue();
@@ -145,6 +145,10 @@ public class ExtractAudio implements ActionListener {
 		} 
 		else if (e.getSource() == extractBtn) {
 			advanced = false;
+			if (extractFile == null) {
+				JOptionPane.showMessageDialog(extract, "Please select a file to extract audio from.");
+				return;
+			}
 			int returnVal = chooser.showSaveDialog(extract);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				outFilename = chooser.getSelectedFile().getName();
@@ -254,6 +258,10 @@ public class ExtractAudio implements ActionListener {
 		} 
 		else if (e.getSource() == advExtractBtn) {
 			advanced = true;
+			if (extractFile == null) {
+				JOptionPane.showMessageDialog(extract, "Please select a file to extract audio from.");
+				return;
+			}
 			startTime = startField.getText();
 			if(!startTime.matches("^(\\d\\d:\\d\\d:\\d\\d)")) {
 				JOptionPane.showMessageDialog(extract, "Please use format hh:mm:ss for start time.");
