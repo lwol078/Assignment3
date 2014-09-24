@@ -1,4 +1,4 @@
-package vamix.work;
+package vamix.GUI;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -20,7 +20,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
-public class ExtractAudio implements ActionListener {
+import vamix.work.ExtractWorker;
+
+public class ExtractAudioGUI implements ActionListener {
 
 	JFrame frame;
 	JInternalFrame extract;
@@ -61,7 +63,7 @@ public class ExtractAudio implements ActionListener {
 	private final int FLAC = 4;
 	private int format = MP3;
 	
-	public ExtractAudio(JFrame frame) {
+	public ExtractAudioGUI(JFrame frame) {
 		this.frame = frame;
 		
 		extract = new JInternalFrame("Extract Audio", true, true);
@@ -117,7 +119,9 @@ public class ExtractAudio implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == openBtn) {
 			int returnVal = chooser.showDialog(extract, "Select");
-			if(returnVal == JFileChooser.APPROVE_OPTION) {
+			if(returnVal == JFileChooser.CANCEL_OPTION) {
+				return;
+			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
 				extractFile = chooser.getSelectedFile();
 				try {
 					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + extractFile.toString() + "\"" + " 2>&1 | grep -q -w Audio:" );
@@ -159,7 +163,7 @@ public class ExtractAudio implements ActionListener {
 				JOptionPane.showMessageDialog(extract, "Please ensure filename ends with default .mp3 suffix");
 				return;
 			}
-			ExtractWorker extractWorker = new ExtractWorker();
+			ExtractWorker extractWorker = new ExtractWorker(this, extractFile, outFilename, outDirectory);
 			extractWorker.execute();
 		}
 		else if (e.getSource() == advancedBtn) {
@@ -308,7 +312,8 @@ public class ExtractAudio implements ActionListener {
 					return;
 				}
 			}
-			ExtractWorker extractWorker = new ExtractWorker();
+			ExtractWorker extractWorker = new ExtractWorker(this, advanced, startTime, endTime,
+					extractFile, outFilename, outDirectory, format);
 			extractWorker.execute();
 		}
 		else if (e.getSource() == showLess) {
@@ -347,74 +352,27 @@ public class ExtractAudio implements ActionListener {
 		}
 	}
 	
-	class ExtractWorker extends SwingWorker<Integer, String> {
-
-		private int status;
-		ProcessBuilder builder;
-
-		@Override
-		protected Integer doInBackground() throws Exception {
-			
-			if (advanced) {
-				switch (format) {
-				case 1: builder = new ProcessBuilder("avconv", "-v", "quiet","-ss",startTime, "-i",
-							extractFile.toString(), "-f", "wav", "-vn", "-y", "-acodec", "copy", "-t", endTime, outFilename);
-					break;
-				case 2: builder = new ProcessBuilder("avconv", "-v", "quiet","-ss",startTime, "-i",
-							extractFile.toString(), "-f", "aac", "-vn", "-y", "-acodec", "copy", "-t", endTime, outFilename);
-					break;
-				case 3: builder = new ProcessBuilder("avconv", "-v", "quiet","-ss",startTime, "-i",
-							extractFile.toString(), "-f", "ogg", "-vn", "-y", "-acodec", "copy", "-t", endTime, outFilename);
-					break;
-				case 4: builder = new ProcessBuilder("avconv", "-v", "quiet","-ss",startTime, "-i",
-							extractFile.toString(), "-f", "flac", "-vn", "-y", "-acodec", "copy", "-t", endTime, outFilename);
-					break;
-				default: builder = new ProcessBuilder("avconv", "-v", "quiet","-ss", startTime, "-i",
-							extractFile.toString(), "-f", "mp3", "-vn", "-y", "-acodec", "mp3", "-t", endTime, outFilename);
-					break;
-				}
-					
+	public void extractDone(int exitStatus, int format, boolean advanced) {
+		if (exitStatus == 0) {
+			JOptionPane.showMessageDialog(extract, "Extract from " + inFileString + " to " + outFilename + " completed successfuly");
+		} else {
+			if (!advanced) {
+				JOptionPane.showMessageDialog(extract, "An error occurred with default .mp3 format, try using a different format in the advanced settings.");
 			} else {
-				builder = new ProcessBuilder("avconv", "-v", "quiet", "-i",
-						extractFile.toString(), "-f", "mp3", "-vn", "-y", "-acodec", "mp3", outFilename);
-			}
-			builder.directory(outDirectory);
-			Process process = builder.start();
-			
-			process.waitFor();
-			status = process.exitValue();
-			return status;
-		}
-
-		@Override
-		protected void done() {
-			try {
-				int exitStatus = get();
-				if (exitStatus == 0) {
-					JOptionPane.showMessageDialog(extract, "Extract from " + inFileString + " to " + outFilename + " completed successfuly");
-				} else {
-					if (!advanced) {
-						JOptionPane.showMessageDialog(extract, "An error occurred with default .mp3 format, try using a different format in the advanced settings.");
-					} else {
-						if (format == MP3) 
-							JOptionPane.showMessageDialog(extract, "An error occurred with selected .mp3 format, please select a valid format.");
-						else if (format == WAV)
-							JOptionPane.showMessageDialog(extract, "An error occurred with selected .wav format, please select a valid format.");
-						else if (format == AAC)
-							JOptionPane.showMessageDialog(extract, "An error occurred with selected .aac format, please select a valid format.");
-						else if (format == OGG)
-							JOptionPane.showMessageDialog(extract, "An error occurred with selected .ogg format, please select a valid format.");
-						else if (format == FLAC)
-							JOptionPane.showMessageDialog(extract, "An error occurred with selected .flac format, please select a valid format.");
-					}
-				}
-				startTime = "";
-				endTime = "";
-				outFilename = "";
-			} catch (Exception ex) {
-
+				if (format == MP3) 
+					JOptionPane.showMessageDialog(extract, "An error occurred with selected .mp3 format, please select a valid format.");
+				else if (format == WAV)
+					JOptionPane.showMessageDialog(extract, "An error occurred with selected .wav format, please select a valid format.");
+				else if (format == AAC)
+					JOptionPane.showMessageDialog(extract, "An error occurred with selected .aac format, please select a valid format.");
+				else if (format == OGG)
+					JOptionPane.showMessageDialog(extract, "An error occurred with selected .ogg format, please select a valid format.");
+				else if (format == FLAC)
+					JOptionPane.showMessageDialog(extract, "An error occurred with selected .flac format, please select a valid format.");
 			}
 		}
-
+		startTime = "";
+		endTime = "";
+		outFilename = "";
 	}
 }

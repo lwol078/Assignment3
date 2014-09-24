@@ -1,15 +1,11 @@
-package vamix.work;
-
+package vamix.GUI;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -18,11 +14,10 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
 
-import vamix.work.ExtractAudio.ExtractWorker;
+import vamix.work.ReplaceWorker;
 
-public class ReplaceAudio implements ActionListener {
+public class ReplaceAudioGUI implements ActionListener {
 
 	JFrame frame;
 	JInternalFrame replace;
@@ -32,13 +27,14 @@ public class ReplaceAudio implements ActionListener {
 	JFileChooser chooser = new JFileChooser();
 	String inVideoString = "No Video Selected";
 	String inAudioString = "No Audio Selected";
+	Insets cInsets = new Insets(20, 20, 20, 20);
 
 	private File videoFile, audioFile, outFile;
 	private String outFilename;
 	private File outDirectory;
 	private ReplaceWorker worker;
 
-	public ReplaceAudio(JFrame frame) {
+	public ReplaceAudioGUI (JFrame frame) {
 		this.frame = frame;
 
 		replace = new JInternalFrame("Replace Audio", true, true);
@@ -55,6 +51,7 @@ public class ReplaceAudio implements ActionListener {
 		} catch (java.beans.PropertyVetoException e) {}
 
 		inVideoLabel = new JLabel("Video to replace audio of: " + inVideoString);
+		c.insets = cInsets;
 		c.weightx = 0.7;
 		c.weighty = 0.3;
 		c.ipadx = 0;
@@ -66,7 +63,7 @@ public class ReplaceAudio implements ActionListener {
 		getVideoBtn.addActionListener(this);
 		c.weightx = 0.3;
 		c.weighty = 0.3;
-		c.ipadx = 50;
+		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 0;
 		replace.add(getVideoBtn, c);
@@ -83,7 +80,7 @@ public class ReplaceAudio implements ActionListener {
 		getAudioBtn.addActionListener(this);
 		c.weightx = 0.3;
 		c.weighty = 0.3;
-		c.ipadx = 50;
+		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 1;
 		replace.add(getAudioBtn, c);
@@ -92,7 +89,7 @@ public class ReplaceAudio implements ActionListener {
 		replaceBtn.addActionListener(this);
 		c.weightx = 0.3;
 		c.weighty = 0.3;
-		c.ipadx = 50;
+		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 2;
 		replace.add(replaceBtn, c);
@@ -102,7 +99,9 @@ public class ReplaceAudio implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getVideoBtn) {
 			int returnVal = chooser.showDialog(replace, "Select");
-			if(returnVal == JFileChooser.APPROVE_OPTION) {
+			if(returnVal == JFileChooser.CANCEL_OPTION) {
+				return;
+			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
 				videoFile = chooser.getSelectedFile();
 				try {
 					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + videoFile + "\"" + " 2>&1 | grep -q -w Video:" );
@@ -130,7 +129,9 @@ public class ReplaceAudio implements ActionListener {
 		}
 		else if (e.getSource() == getAudioBtn) {
 			int returnVal = chooser.showDialog(replace, "Select");
-			if(returnVal == JFileChooser.APPROVE_OPTION) {
+			if (returnVal == JFileChooser.CANCEL_OPTION) {
+				return;
+			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
 				audioFile = chooser.getSelectedFile();
 				try {
 					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + audioFile.toString() + "\"" +" 2>&1 | grep -q -w Audio:" );
@@ -185,6 +186,7 @@ public class ReplaceAudio implements ActionListener {
 
 			replaceBtn.setEnabled(false);
 			GridBagConstraints c = new GridBagConstraints();
+			c.insets = cInsets;
 
 			progressBar = new JProgressBar(0, 100);
 			progressBar.setStringPainted(true);
@@ -200,7 +202,7 @@ public class ReplaceAudio implements ActionListener {
 			cancelBtn.addActionListener(this);
 			c.weightx = 0.3;
 			c.weighty = 0.3;
-			c.ipadx = 50;
+			c.ipadx = 40;
 			c.gridx = 1;
 			c.gridy = 2;
 			replace.add(cancelBtn, c);
@@ -208,11 +210,12 @@ public class ReplaceAudio implements ActionListener {
 			replace.revalidate();
 			replace.repaint();
 
-			worker = new ReplaceWorker();
+			worker = new ReplaceWorker(this, videoFile, audioFile, outDirectory, outFilename);
 			worker.execute();
 		}
 		else if (e.getSource() == cancelBtn) {
 			GridBagConstraints c = new GridBagConstraints();
+			c.insets = cInsets;
 
 			worker.cancel(true);
 			JOptionPane.showMessageDialog(replace, "Replace Audio Cancelled");
@@ -223,7 +226,7 @@ public class ReplaceAudio implements ActionListener {
 			replaceBtn.addActionListener(this);
 			c.weightx = 0.3;
 			c.weighty = 0.3;
-			c.ipadx = 50;
+			c.ipadx = 40;
 			c.gridx = 1;
 			c.gridy = 2;
 			replace.add(replaceBtn, c);
@@ -233,103 +236,34 @@ public class ReplaceAudio implements ActionListener {
 			replace.repaint();
 		}
 	}
-
-	class ReplaceWorker extends SwingWorker<Integer, String> {
-
-		private int status;
-		private ProcessBuilder builder;
-		private int totalFrames;
-
-		@Override
-		protected Integer doInBackground() throws Exception {
-
-			builder = new ProcessBuilder("avconv", "-i", videoFile.toString(), "-i", audioFile.toString(),
-					"-c:v", "copy", "-c:a", "copy", "-map", "0:v", "-map", "1:a", "-y" , outFilename); 
-			builder.directory(outDirectory);
-
-			totalFrames = videoFrameCount(videoFile);
-			Process process = builder.start();
-
-			InputStream err = process.getErrorStream();
-			BufferedReader stderr = new BufferedReader(new InputStreamReader(err));
-
-			String line = null;
-			while ((line = stderr.readLine()) != null) {
-				if (isCancelled()) {
-					process.destroy();
-					break;
-				}
-				if (line.contains("frame=")) {
-					publish(line);
-				}
-			}
-
-			process.waitFor();
-			status = process.exitValue();
-			return status;
+	
+	public void setProgressBar(int progress) {
+		progressBar.setValue(progress);
+	}
+	
+	public void replaceDone(int exitStatus) {
+		if (exitStatus == 0) {
+			JOptionPane.showMessageDialog(replace, "Replace Audio of " + inVideoString + " with " + inAudioString + " completed successfully.");
+		} else {
+			JOptionPane.showMessageDialog(replace, "An error occurred during audio track replacement");
 		}
+		outFilename = "";
+		outFile = null;
+		replace.remove(progressBar);
+		replace.remove(cancelBtn);
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = cInsets;
+		replaceBtn = new JButton("Replace Audio");
+		replaceBtn.addActionListener(this);
+		c.weightx = 0.3;
+		c.weighty = 0.3;
+		c.ipadx = 40;
+		c.gridx = 1;
+		c.gridy = 2;
+		replace.add(replaceBtn, c);
+		replaceBtn.setEnabled(true);
 
-		protected void process(List<String> chunks) {
-			String frames = chunks.get(0).split(" ")[0].split("=")[1];
-			int frameCount = Integer.parseInt(frames);
-			int progress = frameCount/totalFrames * 100;
-			progressBar.setValue(progress);
-		}
-
-		protected void done() {
-			try {
-				int exitStatus = get();
-				if (exitStatus == 0) {
-					JOptionPane.showMessageDialog(replace, "Replace Audio of " + inVideoString + " with " + inAudioString + " completed successfully.");
-				} else {
-					JOptionPane.showMessageDialog(replace, "An error occurred during audio track replacement");
-				}
-				outFilename = "";
-				outFile = null;
-				replace.remove(progressBar);
-				replace.remove(cancelBtn);
-				GridBagConstraints c = new GridBagConstraints();
-				replaceBtn = new JButton("Replace Audio");
-				replaceBtn.addActionListener(ReplaceAudio.this);
-				c.weightx = 0.3;
-				c.weighty = 0.3;
-				c.ipadx = 50;
-				c.gridx = 1;
-				c.gridy = 2;
-				replace.add(replaceBtn, c);
-				replaceBtn.setEnabled(true);
-
-				replace.revalidate();
-				replace.repaint();
-			} catch (Exception ex) {
-
-			}
-		}
-
-		public int videoFrameCount(File videoFile) {
-
-			int frameCount = 0;
-			try {
-				ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "avconv -i " + videoFile.toString() + " -c:v copy -c:a copy -f null /dev/null 2>&1 | grep 'frame='");
-
-				Process process = builder.start();
-
-				InputStream out = process.getInputStream();
-				BufferedReader stdout = new BufferedReader(new InputStreamReader(out));
-
-				String line = null;
-				while ((line = stdout.readLine()) != null) {
-					if (line.contains("frame=")) {
-						String frames = line.split(" ")[0].split("=")[1];
-						frameCount = Integer.parseInt(frames);
-					}
-				}
-			} catch (IOException e) {
-
-			}
-
-			return frameCount;
-		}
-
+		replace.revalidate();
+		replace.repaint();
 	}
 }
