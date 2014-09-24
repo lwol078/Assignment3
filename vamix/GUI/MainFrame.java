@@ -13,8 +13,8 @@ import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
-    private JMenu menu1,menu2,downloadMenu, audioMenu;
-    private JMenuItem openItem,item2, downloadAudio, downloadVideo, extractAudio;
+    private JMenu menu1,textMenu,downloadMenu, audioMenu;
+    private JMenuItem openItem,textItem, downloadAudio, downloadVideo, extractAudio;
     private JDesktopPane desktop;
     private JPanel playerPanel;
     private PlayOptionsPanel playOptionsPanel;
@@ -45,7 +45,15 @@ public class MainFrame extends JFrame implements ActionListener
                 public void windowDeiconified(WindowEvent e){}
                 public void windowIconified(WindowEvent e){}
                 public void windowClosed(WindowEvent e){}
-                public void windowOpened(WindowEvent e){}
+                public void windowOpened(WindowEvent e)
+        		{
+        			Dimension d = getSize();
+                    int width = (int)d.getWidth();
+                    int height = (int)d.getHeight();
+                    playerPanel.setBounds(0, 0, width, height-60);
+                    playOptionsPanel.setBounds(0, height-60, width, 40);
+                    desktop.moveToBack( playerPanel);
+        		}
             });
         addComponentListener(new ComponentAdapter()
             {
@@ -83,17 +91,18 @@ public class MainFrame extends JFrame implements ActionListener
             "The only menu in this program that has menu items");
         menuBar.add(menu1);
 
-        menu2 = new JMenu("Menu2");
+        textMenu = new JMenu("Text");
          menu1.getAccessibleContext().setAccessibleDescription(
-            "Look, a submenu!");
-        menu1.add(menu2);
+            "Add text to a file");
+        menu1.add(textMenu);
 
         openItem = new JMenuItem("Open");
         openItem.addActionListener(this);
         menu1.add(openItem);
 
-        item2 = new JMenuItem("How exciting, I'm in a submenu!");
-        menu2.add(item2);
+        textItem = new JMenuItem("Text stuff");
+        textItem.addActionListener(this);
+        textMenu.add(textItem);
         
         downloadMenu = new JMenu("Download");
         downloadMenu.getAccessibleContext().setAccessibleDescription(
@@ -144,6 +153,16 @@ public class MainFrame extends JFrame implements ActionListener
         else if (e.getSource() == extractAudio)
         {
         	new ExtractAudio(this);
+        }
+        else if (e.getSource() == textItem)
+        {
+            DrawCommandArgs args = new DrawCommandArgs();
+            args.text = "testing stuff";
+            args.size = 20;
+            args.duration = 5;
+            args.startTime = 3;
+            args.sourceFile = currentFile;
+            new DrawCommand(args);
         }
     }
 }
