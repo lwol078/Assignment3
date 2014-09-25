@@ -37,7 +37,6 @@ public class DrawCommand
 		if(sourceFile != null)
 		{
 			worker = new DrawCommandWorker();
-			worker.execute();
 		}
 		else
 		{
@@ -137,7 +136,7 @@ public class DrawCommand
 		List<String> processString = new ArrayList<String>();
 		processString.add("avconv");
 		processString.add("-ss");
-		processString.add(TimeToString(startTime));
+		processString.add(DrawCommandArgs.TimeToString(startTime));
 		processString.add("-i");
 		processString.add(sourceFile.getAbsolutePath());
 		processString.add("-vf");
@@ -176,7 +175,7 @@ public class DrawCommand
 
 		processString.add("avconv");
 		processString.add("-ss");
-		processString.add(TimeToString(duration+startTime));
+		processString.add(DrawCommandArgs.TimeToString(duration+startTime));
 		processString.add("-i");
 		processString.add(sourceFile.getAbsolutePath());
 		processString.add("-y");
@@ -236,14 +235,22 @@ public class DrawCommand
 		return status;
 	}
 
-	public String TimeToString(int time)
+	public void Save(DrawCommandArgs args, File file)
 	{
-		return (time / 3600)+":"+((time % 3600)/60)+":"+(time % 60);
+		try
+		{
+			FileWriter saveWriter = new FileWriter(file.getAbsolutePath());
+			saveWriter.write(args.ToText());
+			saveWriter.close();
+		}
+		catch(Exception err)
+		{
+			JOptionPane.showMessageDialog(null,"Error "+err.getMessage());
+		}
 	}
-	public int StringToTime(String time)
+	public void Execute()
 	{
-		String[] str = time.split(":");
-
-		return Integer.parseInt(str[0])*3600+Integer.parseInt(str[1])*60+Integer.parseInt(str[3]);
+		if(worker != null)
+			worker.execute();
 	}
 }
