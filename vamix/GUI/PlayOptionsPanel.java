@@ -13,6 +13,9 @@ import java.util.Random;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.*;
 
+/**	PlayOptionsPanel
+*	Panel containing the play options for the media
+*/
 public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeListener
 {
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
@@ -56,11 +59,15 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 			{
 				setEnableAll(false);
 				btnPlay.setEnabled(true);
+				timerFastForward.cancel();
+				timerRewind.cancel();
 			}
 			public void paused(MediaPlayer mP)
 			{
 				btnPlay.setEnabled(true);
 				btnPause.setEnabled(false);
+				timerFastForward.cancel();
+				timerRewind.cancel();
 			}
 			public void playing(MediaPlayer mP)
 			{
@@ -152,6 +159,8 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		if(e.getSource() == btnPlay)
 		{
 			mediaPlayerComponent.getMediaPlayer().play();
+			timerFastForward.cancel();
+			timerRewind.cancel();
 		}
 		else if(e.getSource() == btnPause)
 		{

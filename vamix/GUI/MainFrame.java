@@ -11,8 +11,9 @@ import javax.swing.event.*;
 import vamix.work.*;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 
-/**
- *
+/** Mainframe
+ *  The main frame class for the vamix. It contains a menu to access the editing functions,
+ *   a panel containing the play options and the media player
  */
 public class MainFrame extends JFrame implements ActionListener
 {
@@ -29,7 +30,9 @@ public class MainFrame extends JFrame implements ActionListener
     private File currentFile;
     private TextGUI textGUI;
 
-
+    /** Constructor
+    *   Sets everything up to run
+    */
 	public MainFrame() 
 	{
 		super("Vamix - Title");
@@ -43,13 +46,16 @@ public class MainFrame extends JFrame implements ActionListener
         setMinimumSize(new Dimension(100,100));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+
+        //Release media player at end of program and set size on startup
         addWindowListener(new WindowAdapter()
             {
                 public void windowClosing(WindowEvent e)
                 {
                     mediaPlayerComponent.release();
                 }
-                public void windowOpened(WindowEvent e)
+                /*Causes errors for some reason
+                /*public void windowOpened(WindowEvent e)
         		{
 
         			Dimension d = getSize();
@@ -58,7 +64,7 @@ public class MainFrame extends JFrame implements ActionListener
                     playerPanel.setBounds(0, 0, width, height-10);
                     playOptionsPanel.setBounds(0, height-10, width, 80);
                     desktop.moveToBack( playerPanel);
-        		}
+        		}*/
             });
         addComponentListener(new ComponentAdapter()
             {
