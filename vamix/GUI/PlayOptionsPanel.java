@@ -33,12 +33,12 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		muted = false;
 		mediaPlayerComponent = mPC;
 		
-		playIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/playBtn.jpg"));
-		pauseIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/pauseBtn.jpg"));
-		ffIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/ffBtn.jpg"));
-		rwIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/rwBtn.jpg"));
-		muteIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/muteBtn.jpg"));
-		unmuteIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/unmuteBtn.jpg"));
+		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.jpg"));
+		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.jpg"));
+		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.jpg"));
+		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.jpg"));
+		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.jpg"));
+		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.jpg"));
 		mPC.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter()
 		{
 			public void finished(MediaPlayer mP)
@@ -173,7 +173,7 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 	
 	public ImageIcon resizeIcon(ImageIcon icon) {
 		Image img = icon.getImage() ;  
-		Image newimg = img.getScaledInstance( 60, 40,  java.awt.Image.SCALE_SMOOTH ) ;  
+		Image newimg = img.getScaledInstance( 30, 30,  java.awt.Image.SCALE_SMOOTH ) ;  
 	    icon = new ImageIcon( newimg );
 		return icon;
 	}
