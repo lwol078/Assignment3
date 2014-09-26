@@ -18,27 +18,31 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
 	private JButton btnPlay, btnPause, btnMute;
 	private JButton btnSkipBack, btnSkipForward;
-	private JSlider volumeSlider;
+	private JSlider volumeSlider, playSlider;
 	private int volume;
 	private int mutedVolume;
 	private boolean muted;
-	private Timer timerFastForward, timerRewind;
+	private Timer timerFastForward, timerRewind, timerSetPosSlider;
 	private Icon playIcon, pauseIcon, ffIcon, rwIcon, muteIcon, unmuteIcon;
-	//private TimerTask timertaskFastForward, timertaskRewind;
+	private final Dimension BUTTON_DIMENSION = new Dimension(20,20);
+	private boolean playSliderLock, mediaLock;
 
 	public PlayOptionsPanel(EmbeddedMediaPlayerComponent mPC) 
 	{
+		
+		playSliderLock = false;
+		mediaLock = false;
 		volume = 50;
 		mutedVolume = volume;
 		muted = false;
 		mediaPlayerComponent = mPC;
 		
-		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.jpg"));
-		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.jpg"));
-		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.jpg"));
-		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.jpg"));
-		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.jpg"));
-		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.jpg"));
+		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.png"));
+		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.png"));
+		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.png"));
+		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.png"));
+		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.png"));
+		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.png"));
 		mPC.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter()
 		{
 			public void finished(MediaPlayer mP)
@@ -48,57 +52,110 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 				timerFastForward.cancel();
 				timerRewind.cancel();
 			}
+			public void stopped(MediaPlayer mP)
+			{
+				setEnableAll(false);
+				btnPlay.setEnabled(true);
+			}
+			public void paused(MediaPlayer mP)
+			{
+				btnPlay.setEnabled(true);
+				btnPause.setEnabled(false);
+			}
+			public void playing(MediaPlayer mP)
+			{
+				setEnableAll(true);
+				btnPlay.setEnabled(false);
+			}
+			public void positionChanged(MediaPlayer mP, float newPosition)
+			{
+				if(!mediaLock)
+				{
+					playSliderLock = true;
+					int pos = (int)(100*newPosition);
+					if(pos < 0)
+						pos = 0;
+					playSlider.setValue(pos);
+					playSliderLock = false;
+				}
+			}
 		});
 		timerFastForward = new Timer();
 		timerRewind = new Timer();
+		timerSetPosSlider = new Timer();
 
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		GroupLayout layout = new GroupLayout(this);
+		setLayout(layout);
 		setVisible(true);
 
 		btnPlay = new JButton(playIcon);
-		btnPlay.setPreferredSize(new Dimension(100,60));
-		add(btnPlay);
+		btnPlay.setPreferredSize(new Dimension(BUTTON_DIMENSION.width,BUTTON_DIMENSION.height));
 		btnPlay.addActionListener(this);
 
 		btnPause = new JButton(pauseIcon);
-		btnPause.setPreferredSize(new Dimension(100,60));
-		add(btnPause);
+		btnPause.setPreferredSize(new Dimension(BUTTON_DIMENSION.width,BUTTON_DIMENSION.height));
 		btnPause.addActionListener(this);
 
 		btnSkipBack = new JButton(rwIcon);
-		btnSkipBack.setPreferredSize(new Dimension(100,60));
-		add(btnSkipBack);
+		btnSkipBack.setPreferredSize(new Dimension(BUTTON_DIMENSION.width,BUTTON_DIMENSION.height));
 		btnSkipBack.addActionListener(this);
 
 		btnSkipForward = new JButton(ffIcon);
-		btnSkipForward.setPreferredSize(new Dimension(100,60));
-		add(btnSkipForward);
+		btnSkipForward.setPreferredSize(new Dimension(BUTTON_DIMENSION.width,BUTTON_DIMENSION.height));
 		btnSkipForward.addActionListener(this);
 
 		btnMute = new JButton(unmuteIcon);
-		btnMute.setPreferredSize(new Dimension(100,60));
-		add(btnMute);
+		btnMute.setPreferredSize(new Dimension(BUTTON_DIMENSION.width,BUTTON_DIMENSION.height));
 		btnMute.addActionListener(this);
 
 		volumeSlider = new JSlider(JSlider.HORIZONTAL,0,100,volume);
 		volumeSlider.addChangeListener(this);
-		add(new JLabel(" Volume: "));
-		add(volumeSlider);
+		playSlider = new JSlider(JSlider.HORIZONTAL,0,100,0);
+		playSlider.addChangeListener(this);
+
+		JLabel labelVolume = new JLabel(" Volume: ");
+		layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        layout.setHorizontalGroup(
+        	layout.createParallelGroup()
+        		.addComponent(playSlider)
+	        	.addGroup(layout.createSequentialGroup()
+		        	.addComponent(btnPlay)
+		        	.addComponent(btnPause)
+		        	.addComponent(btnSkipBack)
+		        	.addComponent(btnSkipForward)
+		        	.addComponent(btnSkipBack)
+		        	.addComponent(btnMute)
+		        	.addComponent(labelVolume)
+		        	.addComponent(volumeSlider)
+		        	)
+        	);
+        layout.setVerticalGroup(
+        	layout.createSequentialGroup()
+        		.addComponent(playSlider)
+        		.addGroup(layout.createParallelGroup()
+	    			.addComponent(btnPlay)
+		        	.addComponent(btnPause)
+		        	.addComponent(btnSkipBack)
+		        	.addComponent(btnSkipForward)
+		        	.addComponent(btnSkipBack)
+		        	.addComponent(btnMute)
+		        	.addComponent(labelVolume)
+		        	.addComponent(volumeSlider)
+		        	)
+        	);
+        setEnableAll(false);
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
 		if(e.getSource() == btnPlay)
 		{
-			setEnableAll(true);
-			btnPlay.setEnabled(false);
 			mediaPlayerComponent.getMediaPlayer().play();
 		}
 		else if(e.getSource() == btnPause)
 		{
-			setEnableAll(true);
-			btnPause.setEnabled(false);
-			mediaPlayerComponent.getMediaPlayer().pause();
+			mediaPlayerComponent.getMediaPlayer().setPause(true);
 		}
 		else if(e.getSource() == btnSkipForward)
 		{
@@ -169,11 +226,21 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 			mediaPlayerComponent.getMediaPlayer().setVolume(volume);
 			btnMute.setIcon(unmuteIcon);
 		}
+		if(e.getSource() == playSlider)
+		{
+			if (!playSliderLock)
+			{
+				mediaLock = true;
+				mediaPlayerComponent.getMediaPlayer().setPosition((float)playSlider.getValue()/100.0f);
+				mediaPlayerComponent.getMediaPlayer().setPause(true);
+				mediaLock = false;
+			}
+		}
 	}
 	
 	public ImageIcon resizeIcon(ImageIcon icon) {
 		Image img = icon.getImage() ;  
-		Image newimg = img.getScaledInstance( 30, 30,  java.awt.Image.SCALE_SMOOTH ) ;  
+		Image newimg = img.getScaledInstance( 20, 20,  java.awt.Image.SCALE_SMOOTH ) ;  
 	    icon = new ImageIcon( newimg );
 		return icon;
 	}

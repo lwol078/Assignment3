@@ -48,11 +48,12 @@ public class MainFrame extends JFrame implements ActionListener
                 }
                 public void windowOpened(WindowEvent e)
         		{
+
         			Dimension d = getSize();
                     int width = (int)d.getWidth();
                     int height = (int)d.getHeight();
-                    playerPanel.setBounds(0, 0, width, height-60);
-                    playOptionsPanel.setBounds(0, height-60, width, 40);
+                    playerPanel.setBounds(0, 0, width, height-10);
+                    playOptionsPanel.setBounds(0, height-10, width, 80);
                     desktop.moveToBack( playerPanel);
         		}
             });
@@ -63,8 +64,8 @@ public class MainFrame extends JFrame implements ActionListener
                     Dimension d = getSize();
                     int width = (int)d.getWidth();
                     int height = (int)d.getHeight();
-                    playerPanel.setBounds(0, 0, width, height-60);
-                    playOptionsPanel.setBounds(0, height-60, width, 40);
+                    playerPanel.setBounds(0, 0, width, height-100);
+                    playOptionsPanel.setBounds(0, height-100, width, 80);
                     desktop.moveToBack( playerPanel);
                 }
             });

@@ -228,7 +228,16 @@ public class TextGUI implements ActionListener
 			if(returnVal == JFileChooser.APPROVE_OPTION)
 			{
 				sourceFile = jFC.getSelectedFile();
-				String name = sourceFile.getName();
+				if(!ValidateVideoFile(sourceFile))
+				{
+					JOptionPane.showMessageDialog(null,"Please select a valid video file");
+					sourceFile = null;
+				}
+				String name;
+				if(sourceFile == null)
+					name = "No file selected";
+				else
+					name = sourceFile.getName();
 				if(name.length() > 20)
 					name = "..."+name.substring(name.length()-20);
 				labelSource.setText(name);
@@ -242,7 +251,7 @@ public class TextGUI implements ActionListener
 			if(returnVal == JFileChooser.APPROVE_OPTION)
 			{
 				File project = jFC.getSelectedFile();
-				if(!project.exists())
+				if(!project.exists() || !ValidateProjectFile(project))
 					JOptionPane.showMessageDialog(null,"Project not found");
 				else
 				{
@@ -459,5 +468,26 @@ public class TextGUI implements ActionListener
 		spinDur.setValue(args.duration);
 		spinSize.setValue(args.size);
 		comboFont.setSelectedItem(args.fontName);
+	}
+
+	private boolean ValidateVideoFile(File file)
+	{
+		try 
+		{
+			ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + file.getAbsolutePath() + "\"" + " 2>&1 | grep -q -w Video:" );
+			Process process = builder.start();
+			process.waitFor();
+			int exitStatus = process.exitValue();
+			if (exitStatus != 0)
+				return false;
+			return true;
+		}
+		catch(Exception err)
+		{ return false;}
+	}
+
+	private boolean ValidateProjectFile(File file)
+	{
+		return file.getName().endsWith(".vam");
 	}
 }
