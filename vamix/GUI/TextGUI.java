@@ -41,7 +41,7 @@ public class TextGUI implements ActionListener
 		textFrame.setSize(800,500);
 		textFrame.setVisible(true);
 		parent.add(textFrame);
-		textFrame.setLocation(0, 0);
+		textFrame.setLocation(125, 30);
 		try {
 			textFrame.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {}

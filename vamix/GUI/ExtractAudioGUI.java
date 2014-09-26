@@ -23,6 +23,12 @@ import javax.swing.SwingWorker;
 import vamix.work.ExtractWorker;
 
 public class ExtractAudioGUI implements ActionListener {
+	/**
+	 * Creates GUI for stripping audio from a file. performs check for audio stream upon file selection
+	 * using a terminal process with avconv and grep of the output. Has an advanced options button which
+	 * allows for stripping part of an audio file and selecting the output format. Creates and runs
+	 * an extract worker class to perform extraction.
+	 */
 
 	JFrame frame;
 	JInternalFrame extract;

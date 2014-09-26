@@ -29,7 +29,12 @@ import javax.swing.SwingWorker;
 import vamix.work.DownloadWorker;
 
 public class DownloadVideoGUI implements ActionListener, DownloadGUI {
-
+	/**
+	 * This GUI creates and shows the internal frame gui for download video functionality. 
+	 * It extends the DownloadGUI interface to allow it to use download worker. It handles sending error
+	 * messages to the user and progress updates of downloads in progress.
+	 */
+	
 	JFrame frame;
 	JInternalFrame downloadFrame;
 	JTextField url;

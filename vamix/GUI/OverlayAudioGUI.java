@@ -18,6 +18,12 @@ import javax.swing.JProgressBar;
 import vamix.work.OverlayWorker;
 
 public class OverlayAudioGUI implements ActionListener {
+	/**
+	 * Creates and shows internal frame GUI for overlaying audio onto a video file. Performs a check that
+	 * video input file has a video stream and the audio input file has an audio stream. Has a progress
+	 * bar to update user of progress of overlaying audio. Uses filechoosers to select input files and
+	 * where to save output files.
+	 */
 
 	JFrame frame;
 	JInternalFrame overlay;

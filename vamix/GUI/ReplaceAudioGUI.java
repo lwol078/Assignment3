@@ -18,6 +18,12 @@ import javax.swing.JProgressBar;
 import vamix.work.ReplaceWorker;
 
 public class ReplaceAudioGUI implements ActionListener {
+	/**
+	 * Creates and shows GUI for replacing audio files of a video, uses buttons to open filechoosers for
+	 * selecting input video and audio files. Performs a terminal process to check whether inputs are valid
+	 * upon selection. Has a progress bar that updates progress of replace audio process from replace worker
+	 * class. Executes replace worker class to perform replace audio.
+	 */
 
 	JFrame frame;
 	JInternalFrame replace;

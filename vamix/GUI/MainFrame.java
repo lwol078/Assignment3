@@ -11,6 +11,9 @@ import javax.swing.event.*;
 import vamix.work.*;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 
+/**
+ *
+ */
 public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;

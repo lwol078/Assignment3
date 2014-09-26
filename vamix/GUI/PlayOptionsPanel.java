@@ -20,7 +20,6 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 	private JButton btnSkipBack, btnSkipForward;
 	private JSlider volumeSlider, playSlider;
 	private int volume;
-	private int mutedVolume;
 	private boolean muted;
 	private Timer timerFastForward, timerRewind, timerSetPosSlider;
 	private Icon playIcon, pauseIcon, ffIcon, rwIcon, muteIcon, unmuteIcon;
@@ -33,16 +32,17 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		playSliderLock = false;
 		mediaLock = false;
 		volume = 50;
-		mutedVolume = volume;
 		muted = false;
 		mediaPlayerComponent = mPC;
 		
+
 		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.png"));
 		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.png"));
 		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.png"));
 		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.png"));
 		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.png"));
 		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.png"));
+
 		mPC.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter()
 		{
 			public void finished(MediaPlayer mP)

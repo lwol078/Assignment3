@@ -12,6 +12,12 @@ import javax.swing.SwingWorker;
 import vamix.GUI.ReplaceAudioGUI;
 
 public class ReplaceWorker extends SwingWorker<Integer, String> {
+	/**
+	 * ReplaceWorker runs a terminal process using avconv that replaces the audio track of a video with an
+	 * audio file. The constructor is passed the neccessary information to create the process and the class
+	 * returns the exit status of the process along with intermittent progress updates to the progress bar
+	 * in the gui.
+	 */
 	private ReplaceAudioGUI gui;
 
 	private int status;
