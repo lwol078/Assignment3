@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 
 import vamix.work.*;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
@@ -23,6 +24,8 @@ public class MainFrame extends JFrame implements ActionListener
 
     private EmbeddedMediaPlayerComponent mediaPlayerComponent;
     private File currentFile;
+    private TextGUI textGUI;
+
 
 	public MainFrame() 
 	{
@@ -30,23 +33,19 @@ public class MainFrame extends JFrame implements ActionListener
 
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         currentFile = null;
+        textGUI = null;
 
 		setLocation(100, 100);
         setSize(1050, 600);
         setMinimumSize(new Dimension(100,100));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
-        addWindowListener(new WindowListener()
+        addWindowListener(new WindowAdapter()
             {
                 public void windowClosing(WindowEvent e)
                 {
                     mediaPlayerComponent.release();
                 }
-                public void windowActivated(WindowEvent e){}
-                public void windowDeactivated(WindowEvent e){}
-                public void windowDeiconified(WindowEvent e){}
-                public void windowIconified(WindowEvent e){}
-                public void windowClosed(WindowEvent e){}
                 public void windowOpened(WindowEvent e)
         		{
         			Dimension d = getSize();
@@ -173,13 +172,18 @@ public class MainFrame extends JFrame implements ActionListener
         }
         else if (e.getSource() == textItem)
         {
-            DrawCommandArgs args = new DrawCommandArgs();
-            args.text = "testing stuff";
-            args.size = 20;
-            args.duration = 5;
-            args.startTime = 3;
-            args.sourceFile = currentFile;
-            new DrawCommand(args);
+            if(textGUI == null)
+            {
+                textGUI = new TextGUI(this, currentFile);
+                textGUI.addInternalFrameListener(new InternalFrameAdapter()
+                {
+                    @Override
+                    public void internalFrameClosing(InternalFrameEvent e)
+                    {
+                        textGUI = null;
+                    }
+                });
+            }
         }
     }
 }

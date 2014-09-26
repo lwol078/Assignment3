@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.*;
 import java.awt.Point;
+import vamix.GUI.TextGUI;
 
 public class DrawCommand
 {
@@ -14,6 +15,8 @@ public class DrawCommand
 	private String color;
 	private int startTime, duration, size;
 	private String outFile;
+	private String font;
+	private TextGUI gui; 
 
 	private String ext;
 	private DrawCommandWorker worker;
@@ -21,42 +24,52 @@ public class DrawCommand
 	public DrawCommand(DrawCommandArgs args)
 	{
 		sourceFile = args.sourceFile;
-		text = args.text;//"blahblah";
-		p = args.p;//new Point(0,100);
-		color = args.color;//"green";
-		size = args.size;//40;
-		startTime = args.startTime;//5;
-		duration = args.duration;//12;
+		text = args.text;
+		p = args.p;
+		color = args.color;
+		size = args.size;
+		startTime = args.startTime;
+		duration = args.duration;
+		outFile = args.outFile;
+		font = args.fontName;
+		gui = args.gui;
+
 		if(sourceFile != null)
 		{
 			worker = new DrawCommandWorker();
-			worker.execute();
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null,"Please select a valid source file");
 		}
 	}
 
-	private class DrawCommandWorker extends SwingWorker<Integer,Void>
+	private class DrawCommandWorker extends SwingWorker<Integer,Integer>
 	{
 		@Override
 		protected Integer doInBackground()
 		{
 			int status = 0;
-			outFile = "Output file";
 			String fileName = sourceFile.getName();
 			int i = fileName.lastIndexOf('.');
 			if (i > 0)
     			ext = fileName.substring(i+1);
 
 			status = step1();
+			publish(1);
 
 			if(status != 0)
 				return status;
 			status = step2();
+			publish(2);
 			if(status != 0)
 				return status;
 			status = step3();
+			publish(3);
 			if(status != 0)
 				return status;
 			status = step4();
+			publish(4);
 			return status;
 			
 
@@ -75,6 +88,12 @@ public class DrawCommand
 			}
 			catch (Exception ex)
 			{}
+		}
+		@Override
+		protected void process(List<Integer> chunks)
+		{
+			if(gui != null)
+				gui.setProgress(chunks.get(0)*25);
 		}
 	}
 
@@ -117,11 +136,11 @@ public class DrawCommand
 		List<String> processString = new ArrayList<String>();
 		processString.add("avconv");
 		processString.add("-ss");
-		processString.add(TimeToString(startTime));
+		processString.add(DrawCommandArgs.TimeToString(startTime));
 		processString.add("-i");
 		processString.add(sourceFile.getAbsolutePath());
 		processString.add("-vf");
-		processString.add("drawtext=fontcolor="+color+":fontfile=/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
+		processString.add("drawtext=fontcolor="+color+":fontfile=vamix/fonts/"+font
 							+":fontsize="+size+":text='"+text+"':x="+p.x+":y="+p.y);
 		processString.add("-strict");
 		processString.add("experimental");
@@ -156,7 +175,7 @@ public class DrawCommand
 
 		processString.add("avconv");
 		processString.add("-ss");
-		processString.add(TimeToString(duration+startTime));
+		processString.add(DrawCommandArgs.TimeToString(duration+startTime));
 		processString.add("-i");
 		processString.add(sourceFile.getAbsolutePath());
 		processString.add("-y");
@@ -179,7 +198,6 @@ public class DrawCommand
 			JOptionPane.showMessageDialog(null,"An error has occured\n"+ex.getMessage());
 			return -1;
 		}
-
 		return status;
 	}
 
@@ -214,18 +232,25 @@ public class DrawCommand
 			JOptionPane.showMessageDialog(null,"An error has occured\n"+ex.getMessage());
 			return -1;
 		}
-
 		return status;
 	}
 
-	public String TimeToString(int time)
+	public void Save(DrawCommandArgs args, File file)
 	{
-		return (time / 3600)+":"+((time % 3600)/60)+":"+(time % 60);
+		try
+		{
+			FileWriter saveWriter = new FileWriter(file.getAbsolutePath());
+			saveWriter.write(args.ToText());
+			saveWriter.close();
+		}
+		catch(Exception err)
+		{
+			JOptionPane.showMessageDialog(null,"Error "+err.getMessage());
+		}
 	}
-	public int StringToTime(String time)
+	public void Execute()
 	{
-		String[] str = time.split(":");
-
-		return Integer.parseInt(str[0])*3600+Integer.parseInt(str[1])*60+Integer.parseInt(str[3]);
+		if(worker != null)
+			worker.execute();
 	}
 }
