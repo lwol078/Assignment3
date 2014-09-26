@@ -7,6 +7,13 @@ import javax.swing.SwingWorker;
 import vamix.GUI.ExtractAudioGUI;
 
 public class ExtractWorker extends SwingWorker<Integer, String> {
+	/**
+	 * ExtractWorker creates a terminal process that extracts audio from a file. The worker takes as constructor
+	 * arguments all of the relevant arguments to perform the required extract. The arguments depend on
+	 * the ExtractAudioGUI being in advanced mode or not. not advanced extracts the full audio file in mp3
+	 * format while advanced selects from the supported formats and the duration and start time entered in
+	 * the gui. Processes the current number of frames to update the progress bar in the gui.
+	 */
 	private ExtractAudioGUI gui;
 
 	private int status;

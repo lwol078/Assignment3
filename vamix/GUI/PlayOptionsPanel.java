@@ -20,7 +20,6 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 	private JButton btnSkipBack, btnSkipForward;
 	private JSlider volumeSlider;
 	private int volume;
-	private int mutedVolume;
 	private boolean muted;
 	private Timer timerFastForward, timerRewind;
 	private Icon playIcon, pauseIcon, ffIcon, rwIcon, muteIcon, unmuteIcon;
@@ -29,7 +28,6 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 	public PlayOptionsPanel(EmbeddedMediaPlayerComponent mPC) 
 	{
 		volume = 50;
-		mutedVolume = volume;
 		muted = false;
 		mediaPlayerComponent = mPC;
 		

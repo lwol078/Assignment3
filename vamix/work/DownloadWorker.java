@@ -10,6 +10,11 @@ import javax.swing.SwingWorker;
 import vamix.GUI.DownloadGUI;
 
 public class DownloadWorker extends SwingWorker<Integer, String>{
+	/**
+	 * Runs a terminal process with wget that processes the inputted url and downloads the file the url
+	 * points to. Provides a percentage to the gui to update the progress bar. Returns exit status to gui
+	 * to allow gui to update with error messages.
+	 */
 	
 	private DownloadGUI gui;
 	private String urlString;

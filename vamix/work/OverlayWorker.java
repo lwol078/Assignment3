@@ -12,6 +12,12 @@ import javax.swing.SwingWorker;
 import vamix.GUI.OverlayAudioGUI;
 
 public class OverlayWorker extends SwingWorker<Integer, String>{
+	/**
+	 * OverlayWorker runs a terminal process using avconv that overlays the audio tracks of a video and an
+	 * audio file on top of the input video. The constructor is passed the neccessary information
+	 * to create the process and the class returns the exit status of the process along with intermittent
+	 * progress updates to the progress bar in the gui.
+	 */
 	private OverlayAudioGUI gui;
 	
 	private int status;
