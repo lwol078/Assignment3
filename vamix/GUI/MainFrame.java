@@ -85,7 +85,7 @@ public class MainFrame extends JFrame implements ActionListener
         playOptionsPanel = new PlayOptionsPanel(mediaPlayerComponent);
         
         desktop.setLayer( playOptionsPanel, JDesktopPane.DEFAULT_LAYER);
-        desktop.add(playOptionsPanel);
+        desktop.add(playOptionsPanel, BorderLayout.SOUTH);
 
 
         menu1 = new JMenu("Menu1");
