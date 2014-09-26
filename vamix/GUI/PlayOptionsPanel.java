@@ -39,6 +39,7 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.jpg"));
 		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.jpg"));
 		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.jpg"));
+
 		mPC.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter()
 		{
 			public void finished(MediaPlayer mP)
