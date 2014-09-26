@@ -38,7 +38,7 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		muted = false;
 		mediaPlayerComponent = mPC;
 		
-
+		//fetch icons
 		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.png"));
 		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.png"));
 		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.png"));
@@ -170,6 +170,7 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		{
 			setEnableAll(true);
 			btnSkipForward.setEnabled(false);
+			//Skip forward 1s every 50ms
 			timerFastForward.schedule(new TimerTask()
 			{
 				@Override public void run()
@@ -188,7 +189,7 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		{
 			setEnableAll(true);
 			btnSkipBack.setEnabled(false);
-
+			//Skip back 1s every 50ms
 			timerFastForward.schedule(new TimerTask()
 			{
 				@Override public void run()
@@ -212,6 +213,8 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		}
 	}
 
+	/**	Sets Play/Pause/Fastforward/back to the argument
+	*/
 	private void setEnableAll(boolean bool)
 	{
 		btnPlay.setEnabled(bool);

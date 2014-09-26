@@ -6,6 +6,10 @@ import java.util.*;
 import java.awt.Point;
 import vamix.GUI.TextGUI;
 
+/**	DrawCommand
+*	Contains the functionality to overlay text over a portion of a video file. A DrawCommandArgs object must be passed
+*	to the constructor. Call Execute() to execute the command and Save() to save the command into a text file
+*/
 public class DrawCommand
 {
 
@@ -52,6 +56,7 @@ public class DrawCommand
 			int status = 0;
 			String fileName = sourceFile.getName();
 			int i = fileName.lastIndexOf('.');
+			//Get extension of file
 			if (i > 0)
     			ext = fileName.substring(i+1);
 
@@ -96,7 +101,8 @@ public class DrawCommand
 				gui.setProgress(chunks.get(0)*25);
 		}
 	}
-
+	/**	Step 1 of the process: get the video before the text is to be overlaid.
+	*/
 	private int step1()
 	{
 		int status = 0;
@@ -129,6 +135,8 @@ public class DrawCommand
 		return status;
 	}
 
+	/**	Step 2 of the process: get the video while the text is to be overlaid.
+	*/
 	private int step2()
 	{
 		int status = 0;
@@ -166,6 +174,8 @@ public class DrawCommand
 		return status;
 	}
 
+	/**	Step 3 of the process: get the video after the text is to be overlaid.
+	*/
 	private int step3()
 	{
 		int status = 0;
@@ -201,6 +211,8 @@ public class DrawCommand
 		return status;
 	}
 
+	/**	Step 4 of the process: concatenate the videos from steps 1-3.
+	*/
 	private int step4()
 	{
 		int status = 0;

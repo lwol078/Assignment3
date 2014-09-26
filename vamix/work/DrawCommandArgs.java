@@ -7,6 +7,10 @@ import javax.swing.*;
 
 import vamix.GUI.TextGUI;
 
+/**	DrawCommandArgs
+*	Contains the information to pass to the draw command
+*	Simplifies passing info
+*/
 public class DrawCommandArgs
 {
 	public File sourceFile;
@@ -31,6 +35,8 @@ public class DrawCommandArgs
 		outFile = "output";
 		fontName = "Ubuntu-C.tff";
 	}
+	/** Construct from reading a project file
+	*/
 	public DrawCommandArgs(File file)
 	{
 		try
@@ -69,7 +75,8 @@ public class DrawCommandArgs
 			err.printStackTrace();
 		}
 	}
-
+	/** Converts arguments to text format
+	*/
 	public String ToText()
 	{
 		String str = "";
@@ -86,10 +93,12 @@ public class DrawCommandArgs
 	}
 	public static String TimeToString(int time)
 	{
+		//Time must be in hh:mm:ss format
 		return (time / 3600)+":"+((time % 3600)/60)+":"+(time % 60);
 	}
 	public static int StringToTime(String time)
 	{
+		//Time must be in hh:mm:ss format
 		String[] str = time.split(":");
 		return Integer.parseInt(str[0])*3600+Integer.parseInt(str[1])*60+Integer.parseInt(str[2]);
 	}

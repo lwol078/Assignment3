@@ -19,7 +19,7 @@ public class MainFrame extends JFrame implements ActionListener
 {
 	private JMenuBar menuBar;
 
-    private JMenu menu1,textMenu,downloadMenu, audioMenu;
+    private JMenu fileMenu,videoMenu,downloadMenu, audioMenu;
     private JMenuItem openItem,textItem, downloadAudio, downloadVideo, extractAudio, replaceAudio, overlayAudio;
 
     private JDesktopPane desktop;
@@ -97,23 +97,14 @@ public class MainFrame extends JFrame implements ActionListener
         desktop.add(playOptionsPanel, BorderLayout.SOUTH);
 
 
-        menu1 = new JMenu("Menu1");
-        menu1.getAccessibleContext().setAccessibleDescription(
-            "The only menu in this program that has menu items");
-        menuBar.add(menu1);
-
-        textMenu = new JMenu("Text");
-         menu1.getAccessibleContext().setAccessibleDescription(
-            "Add text to a file");
-        menu1.add(textMenu);
+        fileMenu = new JMenu("File");
+        fileMenu.getAccessibleContext().setAccessibleDescription(
+            "Menu for selecting files to open");
+        menuBar.add(fileMenu);
 
         openItem = new JMenuItem("Open");
         openItem.addActionListener(this);
-        menu1.add(openItem);
-
-        textItem = new JMenuItem("Text stuff");
-        textItem.addActionListener(this);
-        textMenu.add(textItem);
+        fileMenu.add(openItem);
         
         downloadMenu = new JMenu("Download");
         downloadMenu.getAccessibleContext().setAccessibleDescription(
@@ -144,6 +135,16 @@ public class MainFrame extends JFrame implements ActionListener
         overlayAudio = new JMenuItem("Overlay Audio Track to Video");
         overlayAudio.addActionListener(this);
         audioMenu.add(overlayAudio);
+
+        videoMenu = new JMenu("Video");
+        audioMenu.getAccessibleContext().setAccessibleDescription(
+                "Menu option for video functionality");
+        menuBar.add(videoMenu);
+
+        textItem = new JMenuItem("Add Text to Video");
+        textItem.addActionListener(this);
+        videoMenu.add(textItem);
+
         setJMenuBar(menuBar);
 
         Canvas player = new Canvas();

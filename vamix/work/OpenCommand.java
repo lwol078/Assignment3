@@ -5,6 +5,9 @@ import java.io.*;
 
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 
+/**	OpenCommand
+*	Call execute to open the file in the media
+*/
 public class OpenCommand
 {
 	private EmbeddedMediaPlayerComponent player;

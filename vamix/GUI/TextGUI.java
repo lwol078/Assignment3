@@ -10,6 +10,9 @@ import java.util.*;
 
 import vamix.work.*;
 
+/**	TextGUI
+*	Contains all the gui elements that pop up when Edit Text is selected
+*/
 public class TextGUI implements ActionListener
 {
 	private JLabel labelFont,labelColor,labelX,labelY,labelText,labelTime,labelDuration, labelSize, labelSource;
@@ -29,8 +32,14 @@ public class TextGUI implements ActionListener
 		sourceFile = source;
 		if(sourceFile == null)
 			labelSource = new JLabel("none selected");
+		else if (!ValidateVideoFile(sourceFile))
+		{
+			sourceFile = null;
+			labelSource = new JLabel("none selected");
+		}
 		else
 		{
+			//Set max length to show of filename
 			String name = sourceFile.getName();
 			if(name.length() > 20)
 				name = "..."+name.substring(name.length()-20);
@@ -77,6 +86,7 @@ public class TextGUI implements ActionListener
 		btnOpen.addActionListener(this);
 
 		labelFont = new JLabel("Font:");
+		//Load fonts from file
 		Vector<String> fonts = new Vector<String>();
 		final File fontFolder = new File("vamix/fonts");
 		for (final File file : fontFolder.listFiles())
@@ -88,7 +98,8 @@ public class TextGUI implements ActionListener
 		}
 
 		comboFont = new JComboBox<String>(fonts);
-		comboFont.setSelectedIndex(0);
+		if(comboFont.getItemCount()!= 0)
+			comboFont.setSelectedIndex(0);
 		comboFont.setMaximumSize(new Dimension(100,20));
 
 		labelColor = new JLabel("Color:");
@@ -457,7 +468,14 @@ public class TextGUI implements ActionListener
 	public void Set(DrawCommandArgs args)
 	{
 		sourceFile = args.sourceFile;
-		labelSource.setText(sourceFile.getName());
+		String name;
+		if(sourceFile == null)
+			name = "No file selected";
+		else
+			name = sourceFile.getName();
+		if(name.length() > 20)
+			name = "..."+name.substring(name.length()-20);
+		labelSource.setText(name);
 		text.setText(args.text);
 		spinX.setValue(args.p.x);
 		spinY.setValue(args.p.y);
