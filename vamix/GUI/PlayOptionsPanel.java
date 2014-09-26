@@ -33,12 +33,13 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		muted = false;
 		mediaPlayerComponent = mPC;
 		
-		playIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/playBtn.jpg"));
-		pauseIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/pauseBtn.jpg"));
-		ffIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/ffBtn.jpg"));
-		rwIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/rwBtn.jpg"));
-		muteIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/muteBtn.jpg"));
-		unmuteIcon = resizeIcon(new ImageIcon("Assignment3/vamix_icons/unmuteBtn.jpg"));
+		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.jpg"));
+		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.jpg"));
+		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.jpg"));
+		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.jpg"));
+		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.jpg"));
+		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.jpg"));
+		
 		mPC.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter()
 		{
 			public void finished(MediaPlayer mP)
