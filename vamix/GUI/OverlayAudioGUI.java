@@ -17,7 +17,7 @@ import javax.swing.JProgressBar;
 
 import vamix.work.OverlayWorker;
 
-public class OverlayAudioGUI implements ActionListener {
+public class OverlayAudioGUI extends JFrame implements ActionListener {
 	/**
 	 * Creates and shows internal frame GUI for overlaying audio onto a video file. Performs a check that
 	 * video input file has a video stream and the audio input file has an audio stream. Has a progress
@@ -26,7 +26,6 @@ public class OverlayAudioGUI implements ActionListener {
 	 */
 
 	JFrame frame;
-	JInternalFrame overlay;
 	JLabel inVideoLabel, inAudioLabel;
 	JButton getVideoBtn, getAudioBtn, overlayBtn, cancelBtn;
 	JProgressBar progressBar;
@@ -41,21 +40,15 @@ public class OverlayAudioGUI implements ActionListener {
 	private OverlayWorker worker;
 
 	public OverlayAudioGUI (JFrame frame) {
+		super("Overlay Audio");
 		this.frame = frame;
-
-		overlay = new JInternalFrame("Overlay Audio", true, true);
-		overlay.setSize(600,400);
-		overlay.setVisible(true);
+		
+		setSize(600,400);
+		setVisible(true);
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = cInsets;
-		overlay.setLayout(layout);
-
-		frame.add(overlay);
-		overlay.setLocation(225, 100);
-		try {
-			overlay.setSelected(true);
-		} catch (java.beans.PropertyVetoException e) {}
+		setLayout(layout);
 
 		inVideoLabel = new JLabel("Video to overlay audio of: " + inVideoString);
 		c.weightx = 0.7;
@@ -63,7 +56,7 @@ public class OverlayAudioGUI implements ActionListener {
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 0;
-		overlay.add(inVideoLabel, c);
+		add(inVideoLabel, c);
 
 		getVideoBtn = new JButton("Select Video File");
 		getVideoBtn.addActionListener(this);
@@ -72,7 +65,7 @@ public class OverlayAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 0;
-		overlay.add(getVideoBtn, c);
+		add(getVideoBtn, c);
 
 		inAudioLabel = new JLabel("Audio Track to Overlay: " + inAudioString);
 		c.weightx = 0.7;
@@ -80,7 +73,7 @@ public class OverlayAudioGUI implements ActionListener {
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 1;
-		overlay.add(inAudioLabel, c);
+		add(inAudioLabel, c);
 
 		getAudioBtn = new JButton("Select Audio File");
 		getAudioBtn.addActionListener(this);
@@ -89,7 +82,7 @@ public class OverlayAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 1;
-		overlay.add(getAudioBtn, c);
+		add(getAudioBtn, c);
 
 		overlayBtn = new JButton("Overlay Audio");
 		overlayBtn.addActionListener(this);
@@ -98,13 +91,13 @@ public class OverlayAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 2;
-		overlay.add(overlayBtn, c);
+		add(overlayBtn, c);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getVideoBtn) {
-			int returnVal = chooser.showDialog(overlay, "Select");
+			int returnVal = chooser.showDialog(this, "Select");
 			if(returnVal == JFileChooser.CANCEL_OPTION) {
 				return;
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -115,7 +108,7 @@ public class OverlayAudioGUI implements ActionListener {
 					process.waitFor();
 					int exitStatus = process.exitValue();
 					if (exitStatus != 0) {
-						JOptionPane.showMessageDialog(overlay, "Please select a valid video file.");
+						JOptionPane.showMessageDialog(this, "Please select a valid video file.");
 						videoFile = null;
 						inVideoString = "No Video Selected";
 						inVideoLabel.setText("Video to overlay audio of: " + inVideoString);
@@ -134,7 +127,7 @@ public class OverlayAudioGUI implements ActionListener {
 			inVideoLabel.repaint();
 		}
 		else if (e.getSource() == getAudioBtn) {
-			int returnVal = chooser.showDialog(overlay, "Select");
+			int returnVal = chooser.showDialog(this, "Select");
 			if (returnVal == JFileChooser.CANCEL_OPTION) {
 				return;
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -145,7 +138,7 @@ public class OverlayAudioGUI implements ActionListener {
 					process.waitFor();
 					int exitStatus = process.exitValue();
 					if (exitStatus != 0) {
-						JOptionPane.showMessageDialog(overlay, "Please select a valid audio file.");
+						JOptionPane.showMessageDialog(this, "Please select a valid audio file.");
 						audioFile = null;
 						inAudioString = "No Audio Selected";
 						inAudioLabel.setText("Audio Track to Overlay: " + inAudioString);
@@ -165,26 +158,26 @@ public class OverlayAudioGUI implements ActionListener {
 		}
 		else if (e.getSource() == overlayBtn) {
 			if (videoFile == null) {
-				JOptionPane.showMessageDialog(overlay, "Please select a video file.");
+				JOptionPane.showMessageDialog(this, "Please select a video file.");
 				return;
 			}
 			if (audioFile == null) {
-				JOptionPane.showMessageDialog(overlay, "Please select an audio file.");
+				JOptionPane.showMessageDialog(this, "Please select an audio file.");
 				return;
 			}
-			int returnVal = chooser.showSaveDialog(overlay);
+			int returnVal = chooser.showSaveDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				outFile = chooser.getSelectedFile();
 				outFilename = chooser.getSelectedFile().getName();
 				outDirectory = chooser.getCurrentDirectory();
 			}
 			if (!outFilename.endsWith(".mp4")) {
-				JOptionPane.showMessageDialog(overlay, "Please ensure filename ends with .mp4 suffix");
+				JOptionPane.showMessageDialog(this, "Please ensure filename ends with .mp4 suffix");
 				return;
 			}
 			if (outFile.exists()) {
 				Object[] options = {"Overwrite", "Cancel"};
-				int n = JOptionPane.showOptionDialog(overlay, "The file " + outFilename + " already exists. Do you want to overwrite the file?", "File Already Exists",
+				int n = JOptionPane.showOptionDialog(this, "The file " + outFilename + " already exists. Do you want to overwrite the file?", "File Already Exists",
 						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, "Cancel");
 				if (n == 1)
 					return;
@@ -201,9 +194,9 @@ public class OverlayAudioGUI implements ActionListener {
 			c.ipadx = 150;
 			c.gridx = 0;
 			c.gridy = 2;
-			overlay.add(progressBar, c);
+			add(progressBar, c);
 
-			overlay.remove(overlayBtn);
+			remove(overlayBtn);
 			cancelBtn = new JButton("Cancel");
 			cancelBtn.addActionListener(this);
 			c.weightx = 0.3;
@@ -211,10 +204,10 @@ public class OverlayAudioGUI implements ActionListener {
 			c.ipadx = 40;
 			c.gridx = 1;
 			c.gridy = 2;
-			overlay.add(cancelBtn, c);
+			add(cancelBtn, c);
 
-			overlay.revalidate();
-			overlay.repaint();
+			revalidate();
+			repaint();
 
 			worker = new OverlayWorker(this, videoFile, audioFile, outDirectory, outFilename);
 			worker.execute();
@@ -224,9 +217,9 @@ public class OverlayAudioGUI implements ActionListener {
 			c.insets = cInsets;
 
 			worker.cancel(true);
-			JOptionPane.showMessageDialog(overlay, "Overlay Audio Cancelled");
-			overlay.remove(progressBar);
-			overlay.remove(cancelBtn);
+			JOptionPane.showMessageDialog(this, "Overlay Audio Cancelled");
+			remove(progressBar);
+			remove(cancelBtn);
 
 			overlayBtn = new JButton("Overlay Audio");
 			overlayBtn.addActionListener(this);
@@ -235,11 +228,11 @@ public class OverlayAudioGUI implements ActionListener {
 			c.ipadx = 40;
 			c.gridx = 1;
 			c.gridy = 2;
-			overlay.add(overlayBtn, c);
+			add(overlayBtn, c);
 			overlayBtn.setEnabled(true);
 
-			overlay.revalidate();
-			overlay.repaint();
+			revalidate();
+			repaint();
 		}
 	}
 	
@@ -249,14 +242,14 @@ public class OverlayAudioGUI implements ActionListener {
 	
 	public void overlayDone(int exitStatus) {
 		if (exitStatus == 0) {
-			JOptionPane.showMessageDialog(overlay, "Overlay Audio of " + inVideoString + " with " + inAudioString + " completed successfully.");
+			JOptionPane.showMessageDialog(this, "Overlay Audio of " + inVideoString + " with " + inAudioString + " completed successfully.");
 		} else {
-			JOptionPane.showMessageDialog(overlay, "An error occurred during audio track overlay.");
+			JOptionPane.showMessageDialog(this, "An error occurred during audio track overlay.");
 		}
 		outFilename = "";
 		outFile = null;
-		overlay.remove(progressBar);
-		overlay.remove(cancelBtn);
+		remove(progressBar);
+		remove(cancelBtn);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = cInsets;
 		overlayBtn = new JButton("Overlay Audio");
@@ -266,10 +259,10 @@ public class OverlayAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 2;
-		overlay.add(overlayBtn, c);
+		add(overlayBtn, c);
 		overlayBtn.setEnabled(true);
 
-		overlay.revalidate();
-		overlay.repaint();
+		revalidate();
+		repaint();
 	}
 }

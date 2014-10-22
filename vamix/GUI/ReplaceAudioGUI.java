@@ -17,7 +17,7 @@ import javax.swing.JProgressBar;
 
 import vamix.work.ReplaceWorker;
 
-public class ReplaceAudioGUI implements ActionListener {
+public class ReplaceAudioGUI extends JFrame implements ActionListener {
 	/**
 	 * Creates and shows GUI for replacing audio files of a video, uses buttons to open filechoosers for
 	 * selecting input video and audio files. Performs a terminal process to check whether inputs are valid
@@ -26,7 +26,6 @@ public class ReplaceAudioGUI implements ActionListener {
 	 */
 
 	JFrame frame;
-	JInternalFrame replace;
 	JLabel inVideoLabel, inAudioLabel;
 	JButton getVideoBtn, getAudioBtn, replaceBtn, cancelBtn;
 	JProgressBar progressBar;
@@ -41,20 +40,18 @@ public class ReplaceAudioGUI implements ActionListener {
 	private ReplaceWorker worker;
 
 	public ReplaceAudioGUI (JFrame frame) {
+		super("Replace Audio");
 		this.frame = frame;
 
-		replace = new JInternalFrame("Replace Audio", true, true);
-		replace.setSize(600,400);
-		replace.setVisible(true);
+		
+		setSize(600,400);
+		setVisible(true);
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
-		replace.setLayout(layout);
+		setLayout(layout);
 
-		frame.add(replace);
-		replace.setLocation(225, 100);
-		try {
-			replace.setSelected(true);
-		} catch (java.beans.PropertyVetoException e) {}
+		setLocation(225, 100);
+		
 
 		inVideoLabel = new JLabel("Video to replace audio of: " + inVideoString);
 		c.insets = cInsets;
@@ -63,7 +60,7 @@ public class ReplaceAudioGUI implements ActionListener {
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 0;
-		replace.add(inVideoLabel, c);
+		add(inVideoLabel, c);
 
 		getVideoBtn = new JButton("Select Video File");
 		getVideoBtn.addActionListener(this);
@@ -72,7 +69,7 @@ public class ReplaceAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 0;
-		replace.add(getVideoBtn, c);
+		add(getVideoBtn, c);
 
 		inAudioLabel = new JLabel("Replacement Audio Track: " + inAudioString);
 		c.weightx = 0.7;
@@ -80,7 +77,7 @@ public class ReplaceAudioGUI implements ActionListener {
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 1;
-		replace.add(inAudioLabel, c);
+		add(inAudioLabel, c);
 
 		getAudioBtn = new JButton("Select Audio File");
 		getAudioBtn.addActionListener(this);
@@ -89,7 +86,7 @@ public class ReplaceAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 1;
-		replace.add(getAudioBtn, c);
+		add(getAudioBtn, c);
 
 		replaceBtn = new JButton("Replace Audio");
 		replaceBtn.addActionListener(this);
@@ -98,13 +95,13 @@ public class ReplaceAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 2;
-		replace.add(replaceBtn, c);
+		add(replaceBtn, c);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == getVideoBtn) {
-			int returnVal = chooser.showDialog(replace, "Select");
+			int returnVal = chooser.showDialog(this, "Select");
 			if(returnVal == JFileChooser.CANCEL_OPTION) {
 				return;
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -115,7 +112,7 @@ public class ReplaceAudioGUI implements ActionListener {
 					process.waitFor();
 					int exitStatus = process.exitValue();
 					if (exitStatus != 0) {
-						JOptionPane.showMessageDialog(replace, "Please select a valid video file.");
+						JOptionPane.showMessageDialog(this, "Please select a valid video file.");
 						videoFile = null;
 						inVideoString = "No Video Selected";
 						inVideoLabel.setText("Video to replace audio of: " + inVideoString);
@@ -134,7 +131,7 @@ public class ReplaceAudioGUI implements ActionListener {
 			inVideoLabel.repaint();
 		}
 		else if (e.getSource() == getAudioBtn) {
-			int returnVal = chooser.showDialog(replace, "Select");
+			int returnVal = chooser.showDialog(this, "Select");
 			if (returnVal == JFileChooser.CANCEL_OPTION) {
 				return;
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -145,7 +142,7 @@ public class ReplaceAudioGUI implements ActionListener {
 					process.waitFor();
 					int exitStatus = process.exitValue();
 					if (exitStatus != 0) {
-						JOptionPane.showMessageDialog(replace, "Please select a valid audio file.");
+						JOptionPane.showMessageDialog(this, "Please select a valid audio file.");
 						audioFile = null;
 						inAudioString = "No Audio Selected";
 						inAudioLabel.setText("Replacement Audio Track: " + inAudioString);
@@ -165,26 +162,26 @@ public class ReplaceAudioGUI implements ActionListener {
 		}
 		else if (e.getSource() == replaceBtn) {
 			if (videoFile == null) {
-				JOptionPane.showMessageDialog(replace, "Please select a video file.");
+				JOptionPane.showMessageDialog(this, "Please select a video file.");
 				return;
 			}
 			if (audioFile == null) {
-				JOptionPane.showMessageDialog(replace, "Please select an audio file.");
+				JOptionPane.showMessageDialog(this, "Please select an audio file.");
 				return;
 			}
-			int returnVal = chooser.showSaveDialog(replace);
+			int returnVal = chooser.showSaveDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				outFile = chooser.getSelectedFile();
 				outFilename = chooser.getSelectedFile().getName();
 				outDirectory = chooser.getCurrentDirectory();
 			}
 			if (!outFilename.endsWith(".mp4")) {
-				JOptionPane.showMessageDialog(replace, "Please ensure filename ends with .mp4 suffix");
+				JOptionPane.showMessageDialog(this, "Please ensure filename ends with .mp4 suffix");
 				return;
 			}
 			if (outFile.exists()) {
 				Object[] options = {"Overwrite", "Cancel"};
-				int n = JOptionPane.showOptionDialog(replace, "The file " + outFilename + " already exists. Do you want to overwrite the file?", "File Already Exists",
+				int n = JOptionPane.showOptionDialog(this, "The file " + outFilename + " already exists. Do you want to overwrite the file?", "File Already Exists",
 						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, "Cancel");
 				if (n == 1)
 					return;
@@ -201,9 +198,9 @@ public class ReplaceAudioGUI implements ActionListener {
 			c.ipadx = 150;
 			c.gridx = 0;
 			c.gridy = 2;
-			replace.add(progressBar, c);
+			add(progressBar, c);
 
-			replace.remove(replaceBtn);
+			remove(replaceBtn);
 			cancelBtn = new JButton("Cancel");
 			cancelBtn.addActionListener(this);
 			c.weightx = 0.3;
@@ -211,10 +208,10 @@ public class ReplaceAudioGUI implements ActionListener {
 			c.ipadx = 40;
 			c.gridx = 1;
 			c.gridy = 2;
-			replace.add(cancelBtn, c);
+			add(cancelBtn, c);
 
-			replace.revalidate();
-			replace.repaint();
+			revalidate();
+			repaint();
 
 			worker = new ReplaceWorker(this, videoFile, audioFile, outDirectory, outFilename);
 			worker.execute();
@@ -224,9 +221,9 @@ public class ReplaceAudioGUI implements ActionListener {
 			c.insets = cInsets;
 
 			worker.cancel(true);
-			JOptionPane.showMessageDialog(replace, "Replace Audio Cancelled");
-			replace.remove(progressBar);
-			replace.remove(cancelBtn);
+			JOptionPane.showMessageDialog(this, "Replace Audio Cancelled");
+			remove(progressBar);
+			remove(cancelBtn);
 
 			replaceBtn = new JButton("Replace Audio");
 			replaceBtn.addActionListener(this);
@@ -235,11 +232,11 @@ public class ReplaceAudioGUI implements ActionListener {
 			c.ipadx = 40;
 			c.gridx = 1;
 			c.gridy = 2;
-			replace.add(replaceBtn, c);
+			add(replaceBtn, c);
 			replaceBtn.setEnabled(true);
 
-			replace.revalidate();
-			replace.repaint();
+			revalidate();
+			repaint();
 		}
 	}
 	
@@ -249,14 +246,14 @@ public class ReplaceAudioGUI implements ActionListener {
 	
 	public void replaceDone(int exitStatus) {
 		if (exitStatus == 0) {
-			JOptionPane.showMessageDialog(replace, "Replace Audio of " + inVideoString + " with " + inAudioString + " completed successfully.");
+			JOptionPane.showMessageDialog(this, "Replace Audio of " + inVideoString + " with " + inAudioString + " completed successfully.");
 		} else {
-			JOptionPane.showMessageDialog(replace, "An error occurred during audio track replacement");
+			JOptionPane.showMessageDialog(this, "An error occurred during audio track replacement");
 		}
 		outFilename = "";
 		outFile = null;
-		replace.remove(progressBar);
-		replace.remove(cancelBtn);
+		remove(progressBar);
+		remove(cancelBtn);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = cInsets;
 		replaceBtn = new JButton("Replace Audio");
@@ -266,10 +263,10 @@ public class ReplaceAudioGUI implements ActionListener {
 		c.ipadx = 40;
 		c.gridx = 1;
 		c.gridy = 2;
-		replace.add(replaceBtn, c);
+		add(replaceBtn, c);
 		replaceBtn.setEnabled(true);
 
-		replace.revalidate();
-		replace.repaint();
+		revalidate();
+		repaint();
 	}
 }

@@ -28,7 +28,7 @@ import javax.swing.SwingWorker;
 
 import vamix.work.DownloadWorker;
 
-public class DownloadVideoGUI implements ActionListener, DownloadGUI {
+public class DownloadVideoGUI extends JFrame implements ActionListener, DownloadGUI {
 	/**
 	 * This GUI creates and shows the internal frame gui for download video functionality. 
 	 * It extends the DownloadGUI interface to allow it to use download worker. It handles sending error
@@ -36,7 +36,6 @@ public class DownloadVideoGUI implements ActionListener, DownloadGUI {
 	 */
 	
 	JFrame frame;
-	JInternalFrame downloadFrame;
 	JTextField url;
 	JProgressBar progressBar;
 	JButton dlBtn;
@@ -47,34 +46,33 @@ public class DownloadVideoGUI implements ActionListener, DownloadGUI {
 	private String urlString;
 
 	public DownloadVideoGUI(JFrame frame) {
+		super("Download Video");
 		this.frame = frame;
 
-		downloadFrame = new JInternalFrame("Download Video", true, true);
-		downloadFrame.setSize(600, 400);
-		downloadFrame.setVisible(true);
+		
+		setSize(600, 400);
+		setVisible(true);
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
-		downloadFrame.setLayout(layout);
+		setLayout(layout);
 		
-		frame.add(downloadFrame);
-		downloadFrame.setLocation(225, 100);
-		try {
-			downloadFrame.setSelected(true);
-		} catch (java.beans.PropertyVetoException e) {}
+		
+		setLocation(225, 100);
+		
 		
 		JLabel dlLabel = new JLabel("Enter URL of video to download here:");
 		c.weightx = 0.3;
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 0;
-		downloadFrame.add(dlLabel, c);
+		add(dlLabel, c);
 		
 		url = new JTextField();
 		c.weightx = 0.5;
 		c.ipadx = 200;
 		c.gridx = 1;
 		c.gridy = 0;
-		downloadFrame.add(url, c);
+		add(url, c);
 
 		dlBtn = new JButton("Download");
 		dlBtn.addActionListener(this);
@@ -82,7 +80,7 @@ public class DownloadVideoGUI implements ActionListener, DownloadGUI {
 		c.ipadx = 0;
 		c.gridx = 2;
 		c.gridy = 0;
-		downloadFrame.add(dlBtn);
+		add(dlBtn);
 	}
 	
 	@Override
@@ -102,7 +100,7 @@ public class DownloadVideoGUI implements ActionListener, DownloadGUI {
 		File file = new File(fileName);
 		if (file.isFile()) {
 			Object[] options = {"Overwrite", "Cancel"};
-			int n = JOptionPane.showOptionDialog(downloadFrame, "The file " + fileName + " already exists. Do you want to overwrite the file?", "File Already Exists",
+			int n = JOptionPane.showOptionDialog(this, "The file " + fileName + " already exists. Do you want to overwrite the file?", "File Already Exists",
 					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, "Cancel");
 			if (n == 0) {
 				file.delete();
@@ -119,37 +117,37 @@ public class DownloadVideoGUI implements ActionListener, DownloadGUI {
 		c.ipadx = 150;
 		c.gridx = 1;
 		c.gridy = 1;
-		downloadFrame.add(progressBar, c);
+		add(progressBar, c);
 		
 		cancelDlBtn = new JButton("Cancel");
 		cancelDlBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) 
 			{
 				worker.cancel(true);
-				JOptionPane.showMessageDialog(downloadFrame, "Download Cancelled");
-				downloadFrame.remove(progressBar);
-				downloadFrame.remove(cancelDlBtn);
-				downloadFrame.revalidate();
-				downloadFrame.repaint();
+				JOptionPane.showMessageDialog(null, "Download Cancelled");
+				remove(progressBar);
+				remove(cancelDlBtn);
+				revalidate();
+				repaint();
 				dlBtn.setEnabled(true);
 			}
 		});
 		c.ipadx = 0;
 		c.gridx = 2;
 		c.gridy = 1;
-		downloadFrame.add(cancelDlBtn,c);
-		downloadFrame.validate();
-		downloadFrame.repaint();
+		add(cancelDlBtn,c);
+		validate();
+		repaint();
 		
 		Object[] options = {"Yes", "No"};
-		int n = JOptionPane.showOptionDialog(downloadFrame, "Please confirm that " + fileName + " is open source", "Open Source Check",
+		int n = JOptionPane.showOptionDialog(this, "Please confirm that " + fileName + " is open source", "Open Source Check",
 				JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, "No");
 		if (n != 0) {
-			JOptionPane.showMessageDialog(downloadFrame, "Can only download open source files, please enter the url of an open source file");
-			downloadFrame.remove(progressBar);
-			downloadFrame.remove(cancelDlBtn);
-			downloadFrame.validate();
-			downloadFrame.repaint();
+			JOptionPane.showMessageDialog(this, "Can only download open source files, please enter the url of an open source file");
+			remove(progressBar);
+			remove(cancelDlBtn);
+			validate();
+			repaint();
 			dlBtn.setEnabled(true);
 		} else if (n == 0) {
 			worker.execute();
@@ -160,15 +158,15 @@ public class DownloadVideoGUI implements ActionListener, DownloadGUI {
 	public void downloadDone(int exitStatus) {
 		progressBar.setValue(progressBar.getMinimum());
 		if (exitStatus == 0) {
-			JOptionPane.showMessageDialog(downloadFrame, "Download of " + fileName + " completed successfuly");
+			JOptionPane.showMessageDialog(this, "Download of " + fileName + " completed successfuly");
 		} else {
-			JOptionPane.showMessageDialog(downloadFrame, "An error occurred during download, please ensure to enter a valid url");
+			JOptionPane.showMessageDialog(this, "An error occurred during download, please ensure to enter a valid url");
 		}
 		fileName = "";
-		downloadFrame.remove(progressBar);
-		downloadFrame.remove(cancelDlBtn);
-		downloadFrame.validate();
-		downloadFrame.repaint();
+		remove(progressBar);
+		remove(cancelDlBtn);
+		validate();
+		repaint();
 		dlBtn.setEnabled(true);
 	}
 

@@ -22,7 +22,7 @@ import javax.swing.SwingWorker;
 
 import vamix.work.ExtractWorker;
 
-public class ExtractAudioGUI implements ActionListener {
+public class ExtractAudioGUI extends JFrame implements ActionListener {
 	/**
 	 * Creates GUI for stripping audio from a file. performs check for audio stream upon file selection
 	 * using a terminal process with avconv and grep of the output. Has an advanced options button which
@@ -31,7 +31,6 @@ public class ExtractAudioGUI implements ActionListener {
 	 */
 
 	JFrame frame;
-	JInternalFrame extract;
 	JButton openBtn;
 	JButton advancedBtn;
 	JButton advExtractBtn;
@@ -70,20 +69,15 @@ public class ExtractAudioGUI implements ActionListener {
 	private int format = MP3;
 	
 	public ExtractAudioGUI(JFrame frame) {
+		super("Extract Audio");
 		this.frame = frame;
 		
-		extract = new JInternalFrame("Extract Audio", true, true);
-		extract.setSize(600,400);
-		extract.setVisible(true);
+		
+		setSize(600,400);
+		setVisible(true);
 		GridBagLayout layout = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
-		extract.setLayout(layout);
-		
-		frame.add(extract);
-		extract.setLocation(225, 100);
-		try {
-			extract.setSelected(true);
-		} catch (java.beans.PropertyVetoException e) {}
+		setLayout(layout);
 		
 		inFileLabel = new JLabel("File to extract audio from: " + inFileString);
 		c.weightx = 0.7;
@@ -91,7 +85,7 @@ public class ExtractAudioGUI implements ActionListener {
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 0;
-		extract.add(inFileLabel, c);
+		add(inFileLabel, c);
 		
 		openBtn = new JButton("Choose File");
 		openBtn.addActionListener(this);
@@ -100,7 +94,7 @@ public class ExtractAudioGUI implements ActionListener {
 		c.ipadx = 50;
 		c.gridx = 1;
 		c.gridy = 0;
-		extract.add(openBtn, c);
+		add(openBtn, c);
 		
 		advancedBtn = new JButton("Advanced Options");
 		advancedBtn.addActionListener(this);
@@ -109,7 +103,7 @@ public class ExtractAudioGUI implements ActionListener {
 		c.ipadx = 0;
 		c.gridx = 0;
 		c.gridy = 1;
-		extract.add(advancedBtn, c);
+		add(advancedBtn, c);
 		
 		extractBtn = new JButton("Extract Audio");
 		extractBtn.addActionListener(this);
@@ -118,13 +112,13 @@ public class ExtractAudioGUI implements ActionListener {
 		c.ipadx = 50;
 		c.gridx = 1;
 		c.gridy = 1;
-		extract.add(extractBtn, c);
+		add(extractBtn, c);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == openBtn) {
-			int returnVal = chooser.showDialog(extract, "Select");
+			int returnVal = chooser.showDialog(this, "Select");
 			if(returnVal == JFileChooser.CANCEL_OPTION) {
 				return;
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -135,7 +129,7 @@ public class ExtractAudioGUI implements ActionListener {
 					process.waitFor();
 					int exitStatus = process.exitValue();
 					if (exitStatus != 0) {
-						JOptionPane.showMessageDialog(extract, "Please select a video file with an audio stream to extract from.");
+						JOptionPane.showMessageDialog(this, "Please select a video file with an audio stream to extract from.");
 						extractFile = null;
 						inFileString = "No File Selected";
 						inFileLabel.setText("File to extract audio from: " + inFileString);
@@ -156,17 +150,17 @@ public class ExtractAudioGUI implements ActionListener {
 		else if (e.getSource() == extractBtn) {
 			advanced = false;
 			if (extractFile == null) {
-				JOptionPane.showMessageDialog(extract, "Please select a file to extract audio from.");
+				JOptionPane.showMessageDialog(this, "Please select a file to extract audio from.");
 				return;
 			}
-			int returnVal = chooser.showSaveDialog(extract);
+			int returnVal = chooser.showSaveDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				outFilename = chooser.getSelectedFile().getName();
 				outDirectory = chooser.getCurrentDirectory();
 			}
 			format = MP3;
 			if (!outFilename.endsWith(".mp3")) {
-				JOptionPane.showMessageDialog(extract, "Please ensure filename ends with default .mp3 suffix");
+				JOptionPane.showMessageDialog(this, "Please ensure filename ends with default .mp3 suffix");
 				return;
 			}
 			ExtractWorker extractWorker = new ExtractWorker(this, extractFile, outFilename, outDirectory);
@@ -175,8 +169,8 @@ public class ExtractAudioGUI implements ActionListener {
 		else if (e.getSource() == advancedBtn) {
 			advanced = true;
 			GridBagConstraints c = new GridBagConstraints();
-			extract.remove(advancedBtn);
-			extract.remove(extractBtn);
+			remove(advancedBtn);
+			remove(extractBtn);
 			
 			startLabel = new JLabel("Start time in format: hh:mm:ss");
 			c.weightx = 0.6;
@@ -184,7 +178,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 0;
 			c.gridx = 0;
 			c.gridy = 1;
-			extract.add(startLabel, c);
+			add(startLabel, c);
 			
 			startField = new JTextField();
 			c.weightx = 0.4;
@@ -192,7 +186,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 100;
 			c.gridx = 1;
 			c.gridy = 1;
-			extract.add(startField, c);
+			add(startField, c);
 			
 			endLabel = new JLabel("Output duration in format: hh:mm:ss");
 			c.weightx = 0.6;
@@ -200,7 +194,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 0;
 			c.gridx = 0;
 			c.gridy = 2;
-			extract.add(endLabel, c);
+			add(endLabel, c);
 			
 			endField = new JTextField();
 			c.weightx = 0.4;
@@ -208,7 +202,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 100;
 			c.gridx = 1;
 			c.gridy = 2;
-			extract.add(endField, c);
+			add(endField, c);
 			
 			formatLabel = new JLabel("Select format for output file");
 			c.weightx = 0.6;
@@ -216,7 +210,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 0;
 			c.gridx = 0;
 			c.gridy = 3;
-			extract.add(formatLabel, c);
+			add(formatLabel, c);
 			
 			mp3Btn = new JRadioButton("mp3");
 			mp3Btn.setSelected(true);
@@ -243,7 +237,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 50;
 			c.gridx = 1;
 			c.gridy = 3;
-			extract.add(formatPanel, c);
+			add(formatPanel, c);
 			
 			showLess = new JButton("Show less");
 			showLess.addActionListener(this);
@@ -252,7 +246,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 0;
 			c.gridx = 0;
 			c.gridy = 4;
-			extract.add(showLess, c);
+			add(showLess, c);
 			
 			advExtractBtn = new JButton("Extract Audio");
 			advExtractBtn.addActionListener(this);
@@ -261,28 +255,28 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 50;
 			c.gridx = 1;
 			c.gridy = 4;
-			extract.add(advExtractBtn, c);
+			add(advExtractBtn, c);
 			
-			extract.revalidate();
-			extract.repaint();
+			revalidate();
+			repaint();
 		} 
 		else if (e.getSource() == advExtractBtn) {
 			advanced = true;
 			if (extractFile == null) {
-				JOptionPane.showMessageDialog(extract, "Please select a file to extract audio from.");
+				JOptionPane.showMessageDialog(this, "Please select a file to extract audio from.");
 				return;
 			}
 			startTime = startField.getText();
 			if(!startTime.matches("^(\\d\\d:\\d\\d:\\d\\d)")) {
-				JOptionPane.showMessageDialog(extract, "Please use format hh:mm:ss for start time.");
+				JOptionPane.showMessageDialog(this, "Please use format hh:mm:ss for start time.");
 				return;
 			}
 			endTime = endField.getText();
 			if(!endTime.matches("^(\\d\\d:\\d\\d:\\d\\d)")) {
-				JOptionPane.showMessageDialog(extract, "Please use format hh:mm:ss for duration time.");
+				JOptionPane.showMessageDialog(this, "Please use format hh:mm:ss for duration time.");
 				return;
 			}
-			int returnVal = chooser.showSaveDialog(extract);
+			int returnVal = chooser.showSaveDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				outFilename = chooser.getSelectedFile().getName();
 				outDirectory = chooser.getCurrentDirectory();
@@ -290,31 +284,31 @@ public class ExtractAudioGUI implements ActionListener {
 			if (mp3Btn.isSelected()) {
 				format = MP3;
 				if (!outFilename.endsWith(".mp3")) {
-					JOptionPane.showMessageDialog(extract, "Please ensure filename ends with selected .mp3 suffix.");
+					JOptionPane.showMessageDialog(this, "Please ensure filename ends with selected .mp3 suffix.");
 					return;
 				}
 			} else if (wavBtn.isSelected()) {
 				format = WAV;
 				if (!outFilename.endsWith(".wav")) {
-					JOptionPane.showMessageDialog(extract, "Please ensure filename ends with selected .wav suffix.");
+					JOptionPane.showMessageDialog(this, "Please ensure filename ends with selected .wav suffix.");
 					return;
 				}
 			} else if (aacBtn.isSelected()) {
 				format = AAC;
 				if (!outFilename.endsWith(".aac")) {
-					JOptionPane.showMessageDialog(extract, "Please ensure filename ends with selected .aac suffix.");
+					JOptionPane.showMessageDialog(this, "Please ensure filename ends with selected .aac suffix.");
 					return;
 				}
 			} else if (oggBtn.isSelected()) {
 				format = OGG;
 				if (!outFilename.endsWith(".ogg")) {
-					JOptionPane.showMessageDialog(extract, "Please ensure filename ends with selected .ogg suffix.");
+					JOptionPane.showMessageDialog(this, "Please ensure filename ends with selected .ogg suffix.");
 					return;
 				}
 			} else if (flacBtn.isSelected()) {
 				format = FLAC;
 				if (!outFilename.endsWith(".flac")) {
-					JOptionPane.showMessageDialog(extract, "Please ensure filename ends with selected .flac suffix.");
+					JOptionPane.showMessageDialog(this, "Please ensure filename ends with selected .flac suffix.");
 					return;
 				}
 			}
@@ -326,14 +320,14 @@ public class ExtractAudioGUI implements ActionListener {
 			advanced = false;
 			GridBagConstraints c = new GridBagConstraints();
 			
-			extract.remove(startLabel);
-			extract.remove(startField);
-			extract.remove(endLabel);
-			extract.remove(endField);
-			extract.remove(formatLabel);
-			extract.remove(formatPanel);
-			extract.remove(showLess);
-			extract.remove(advExtractBtn);
+			remove(startLabel);
+			remove(startField);
+			remove(endLabel);
+			remove(endField);
+			remove(formatLabel);
+			remove(formatPanel);
+			remove(showLess);
+			remove(advExtractBtn);
 			
 			advancedBtn = new JButton("Advanced Options");
 			advancedBtn.addActionListener(this);
@@ -342,7 +336,7 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 0;
 			c.gridx = 0;
 			c.gridy = 1;
-			extract.add(advancedBtn, c);
+			add(advancedBtn, c);
 			
 			extractBtn = new JButton("Extract Audio");
 			extractBtn.addActionListener(this);
@@ -351,30 +345,30 @@ public class ExtractAudioGUI implements ActionListener {
 			c.ipadx = 50;
 			c.gridx = 1;
 			c.gridy = 1;
-			extract.add(extractBtn, c);
+			add(extractBtn, c);
 			
-			extract.revalidate();
-			extract.repaint();
+			revalidate();
+			repaint();
 		}
 	}
 	
 	public void extractDone(int exitStatus, int format, boolean advanced) {
 		if (exitStatus == 0) {
-			JOptionPane.showMessageDialog(extract, "Extract from " + inFileString + " to " + outFilename + " completed successfuly");
+			JOptionPane.showMessageDialog(this, "Extract from " + inFileString + " to " + outFilename + " completed successfuly");
 		} else {
 			if (!advanced) {
-				JOptionPane.showMessageDialog(extract, "An error occurred with default .mp3 format, try using a different format in the advanced settings.");
+				JOptionPane.showMessageDialog(this, "An error occurred with default .mp3 format, try using a different format in the advanced settings.");
 			} else {
 				if (format == MP3) 
-					JOptionPane.showMessageDialog(extract, "An error occurred with selected .mp3 format, please select a valid format.");
+					JOptionPane.showMessageDialog(this, "An error occurred with selected .mp3 format, please select a valid format.");
 				else if (format == WAV)
-					JOptionPane.showMessageDialog(extract, "An error occurred with selected .wav format, please select a valid format.");
+					JOptionPane.showMessageDialog(this, "An error occurred with selected .wav format, please select a valid format.");
 				else if (format == AAC)
-					JOptionPane.showMessageDialog(extract, "An error occurred with selected .aac format, please select a valid format.");
+					JOptionPane.showMessageDialog(this, "An error occurred with selected .aac format, please select a valid format.");
 				else if (format == OGG)
-					JOptionPane.showMessageDialog(extract, "An error occurred with selected .ogg format, please select a valid format.");
+					JOptionPane.showMessageDialog(this, "An error occurred with selected .ogg format, please select a valid format.");
 				else if (format == FLAC)
-					JOptionPane.showMessageDialog(extract, "An error occurred with selected .flac format, please select a valid format.");
+					JOptionPane.showMessageDialog(this, "An error occurred with selected .flac format, please select a valid format.");
 			}
 		}
 		startTime = "";

@@ -186,10 +186,9 @@ public class MainFrame extends JFrame implements ActionListener
             if(textGUI == null)
             {
                 textGUI = new TextGUI(this, currentFile);
-                textGUI.addInternalFrameListener(new InternalFrameAdapter()
+                textGUI.addWindowListener(new WindowAdapter()
                 {
-                    @Override
-                    public void internalFrameClosing(InternalFrameEvent e)
+                    public void windowClosing(WindowEvent e)
                     {
                         textGUI = null;
                     }

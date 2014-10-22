@@ -14,7 +14,7 @@ import vamix.work.*;
 /**	TextGUI
 *	Contains all the gui elements that pop up when Edit Text is selected
 */
-public class TextGUI implements ActionListener
+public class TextGUI extends JFrame implements ActionListener
 {
 	private final int MAXLENGTH = 40;
 
@@ -27,12 +27,12 @@ public class TextGUI implements ActionListener
 
 	private JFrame parent;
 	private JPanel mainPanel, formatPanel, positionPanel, timePanel, sourcePanel, leftPanel, rightPanel;
-	private JInternalFrame textFrame;
 	private File sourceFile;
 	private Color selectedColor;
 
 	public TextGUI(JFrame frame, File source)
 	{
+		super("Edit Text");
 		sourceFile = source;
 		selectedColor = new Color(0,0,0);
 		if(sourceFile == null)
@@ -51,14 +51,9 @@ public class TextGUI implements ActionListener
 			labelSource = new JLabel(name);
 		}
 		parent = frame;
-		textFrame = new JInternalFrame("Edit text",false,true);
-		textFrame.setSize(800,500);
-		textFrame.setVisible(true);
-		parent.add(textFrame);
-		textFrame.setLocation(125, 30);
-		try {
-			textFrame.setSelected(true);
-		} catch (java.beans.PropertyVetoException e) {}
+		setSize(800,500);
+		setVisible(true);
+		setLocation(125, 30);
 		mainPanel = new JPanel();
 		leftPanel = new JPanel();
 		rightPanel = new JPanel();
@@ -67,10 +62,10 @@ public class TextGUI implements ActionListener
 		positionPanel = new JPanel();
 		timePanel = new JPanel();
 
-		textFrame.setContentPane(mainPanel);
+		setContentPane(mainPanel);
 
-		GroupLayout layout = new GroupLayout(textFrame.getContentPane());
-		textFrame.getContentPane().setLayout(layout);
+		GroupLayout layout = new GroupLayout(getContentPane());
+		getContentPane().setLayout(layout);
 		GroupLayout srcLayout = new GroupLayout(sourcePanel);
 		sourcePanel.setLayout(srcLayout);
 		GroupLayout formatLayout = new GroupLayout(formatPanel);
@@ -203,7 +198,7 @@ public class TextGUI implements ActionListener
 			else
 			{
 				JFileChooser jFC = new JFileChooser();
-				int returnVal = jFC.showSaveDialog(textFrame);
+				int returnVal = jFC.showSaveDialog(this);
 				if(returnVal == JFileChooser.APPROVE_OPTION) 
 				{
 					DrawCommandArgs args = new DrawCommandArgs();
@@ -231,7 +226,7 @@ public class TextGUI implements ActionListener
 			else
 			{
 				JFileChooser jFC = new JFileChooser();
-				int returnVal = jFC.showSaveDialog(textFrame);
+				int returnVal = jFC.showSaveDialog(this);
 				if(returnVal == JFileChooser.APPROVE_OPTION) 
 				{
 					DrawCommandArgs args = new DrawCommandArgs();
@@ -254,7 +249,7 @@ public class TextGUI implements ActionListener
 		else if(e.getSource() == btnChoose)
 		{
 			JFileChooser jFC = new JFileChooser();
-			int returnVal = jFC.showOpenDialog(textFrame);
+			int returnVal = jFC.showOpenDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION)
 			{
 				sourceFile = jFC.getSelectedFile();
@@ -277,7 +272,7 @@ public class TextGUI implements ActionListener
 		else if(e.getSource() == btnOpen)
 		{
 			JFileChooser jFC = new JFileChooser();
-			int returnVal = jFC.showOpenDialog(textFrame);
+			int returnVal = jFC.showOpenDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION)
 			{
 				File project = jFC.getSelectedFile();
@@ -303,11 +298,6 @@ public class TextGUI implements ActionListener
 	private int ToSeconds(int hr, int min, int sec)
 	{
 		return 3600*hr+60*min+sec;
-	}
-
-	public void addInternalFrameListener(InternalFrameListener listener)
-	{
-		textFrame.addInternalFrameListener(listener);
 	}
 
 	public void setProgress(int pct)
