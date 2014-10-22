@@ -1,6 +1,7 @@
 package vamix.GUI;
 
 import javax.swing.*;
+import javax.swing.text.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -15,21 +16,25 @@ import vamix.work.*;
 */
 public class TextGUI implements ActionListener
 {
+	private final int MAXLENGTH = 40;
+
 	private JLabel labelFont,labelColor,labelX,labelY,labelText,labelTime,labelDuration, labelSize, labelSource;
-	private JComboBox<String> comboFont, comboColor;
+	private JComboBox<String> comboFont;
 	private JSpinner spinX, spinY, spinHr, spinMin, spinSec, spinDur, spinSize;
 	private JTextField text;
-	private JButton btnSave, btnChoose, btnOpen, btnDo;
+	private JButton btnSave, btnChoose, btnOpen, btnDo, btnColor;
 	private JProgressBar progress;
 
 	private JFrame parent;
 	private JPanel mainPanel, formatPanel, positionPanel, timePanel, sourcePanel, leftPanel, rightPanel;
 	private JInternalFrame textFrame;
 	private File sourceFile;
+	private Color selectedColor;
 
 	public TextGUI(JFrame frame, File source)
 	{
 		sourceFile = source;
+		selectedColor = new Color(0,0,0);
 		if(sourceFile == null)
 			labelSource = new JLabel("none selected");
 		else if (!ValidateVideoFile(sourceFile))
@@ -103,10 +108,8 @@ public class TextGUI implements ActionListener
 		comboFont.setMaximumSize(new Dimension(100,20));
 
 		labelColor = new JLabel("Color:");
-		String[] colors = {"white","green","black","blue"};
-		comboColor = new JComboBox<String>(colors);
-		comboColor.setSelectedIndex(0);
-		comboColor.setMaximumSize(new Dimension(100,20));
+		btnColor = new JButton("Select");
+		btnColor.addActionListener(this);
 
 		labelSize = new JLabel("Size:");
 		spinSize = new JSpinner(new SpinnerNumberModel(10,1,50,1));
@@ -120,8 +123,21 @@ public class TextGUI implements ActionListener
 		spinY = new JSpinner(new SpinnerNumberModel(0,0,100,1));
 		spinY.setMaximumSize(new Dimension(30,20));
 
-		labelText = new JLabel("Text:");
-		text = new JTextField();
+
+		text = new JTextField(40);
+		text.setMaximumSize(new Dimension(335,40));
+		text.setDocument(new PlainDocument()
+		{
+			public void insertString(int offs, String str, AttributeSet a) throws BadLocationException
+			{
+				if (str == null)
+			      return;
+
+			    if ((getLength() + str.length()) <= 40)
+			      super.insertString(offs, str, a);
+			}
+
+		});
 
 		labelTime = new JLabel("Time:");
 		spinHr = new JSpinner(new SpinnerNumberModel(0,0,60,1));
@@ -138,11 +154,13 @@ public class TextGUI implements ActionListener
 		btnSave = new JButton("Save Project");
 		btnSave.addActionListener(this);
 
-		btnDo = new JButton("Do");
+		btnDo = new JButton("Process");
 		btnDo.addActionListener(this);
 
 		progress = new JProgressBar(0,100);
+		progress.setString("");
 		progress.setStringPainted(true);
+		progress.setMaximumSize(new Dimension(160,25));
 
 		//Main panel layout
         MainLayout(layout);
@@ -170,7 +188,7 @@ public class TextGUI implements ActionListener
         sourcePanel.setBorder(BorderFactory.createTitledBorder(etched,"Source"));
         formatPanel.setBorder(BorderFactory.createTitledBorder(etched,"Format"));
         positionPanel.setBorder(BorderFactory.createTitledBorder(etched,"Position"));
-        text.setBorder(BorderFactory.createTitledBorder(etched,"Text"));
+        text.setBorder(BorderFactory.createTitledBorder(etched,"Text (Max 40 characters):"));
         timePanel.setBorder(BorderFactory.createTitledBorder(etched,"Time"));
 
 
@@ -192,7 +210,7 @@ public class TextGUI implements ActionListener
 					args.sourceFile = sourceFile;
 					args.text = text.getText();
 					args.p = new Point((int)spinX.getValue(),(int)spinX.getValue());
-					args.color = (String)comboColor.getSelectedItem();
+					args.color = "0x"+ColorToString(selectedColor);
 					args.startTime = ToSeconds((int)spinHr.getValue(),(int)spinMin.getValue(),(int)spinSec.getValue());
 					args.duration = (int)spinDur.getValue();
 					args.size = (int)spinSize.getValue();
@@ -220,7 +238,7 @@ public class TextGUI implements ActionListener
 					args.sourceFile = sourceFile;
 					args.text = text.getText();
 					args.p = new Point((int)spinX.getValue(),(int)spinX.getValue());
-					args.color = (String)comboColor.getSelectedItem();
+					args.color = "0x"+ColorToString(selectedColor);
 					args.startTime = ToSeconds((int)spinHr.getValue(),(int)spinMin.getValue(),(int)spinSec.getValue());
 					args.duration = (int)spinDur.getValue();
 					args.size = (int)spinSize.getValue();
@@ -229,6 +247,7 @@ public class TextGUI implements ActionListener
 					args.gui = this;
 
 					new DrawCommand(args).Execute();
+					btnDo.setEnabled(false);
 				}
 			}
 		}
@@ -269,7 +288,15 @@ public class TextGUI implements ActionListener
 					Set(new DrawCommandArgs(project));
 				}
 			}
-
+		}
+		else if(e.getSource() == btnColor)
+		{
+		Color newColor = JColorChooser.showDialog(
+                    null,
+                    "Choose Text Color",
+                    selectedColor);
+		if(newColor != null)
+			selectedColor = newColor;
 		}
 	}
 
@@ -286,6 +313,7 @@ public class TextGUI implements ActionListener
 	public void setProgress(int pct)
 	{
 		progress.setValue(pct);
+		progress.setString("Processing: " + pct + "%");
 	}
 
 	public void MainLayout(GroupLayout layout)
@@ -317,7 +345,7 @@ public class TextGUI implements ActionListener
     				)
     			.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
     				.addComponent(comboFont)
-    				.addComponent(comboColor)
+    				.addComponent(btnColor)
     				.addComponent(spinSize)
     				)
     		);
@@ -329,7 +357,7 @@ public class TextGUI implements ActionListener
     				)
     			.addGroup(layout.createParallelGroup()
     				.addComponent(labelColor)
-    				.addComponent(comboColor)
+    				.addComponent(btnColor)
     				)
     			.addGroup(layout.createParallelGroup()
     				.addComponent(labelSize)
@@ -479,7 +507,7 @@ public class TextGUI implements ActionListener
 		text.setText(args.text);
 		spinX.setValue(args.p.x);
 		spinY.setValue(args.p.y);
-		comboColor.setSelectedItem(args.color);
+		selectedColor = StringToColor(args.color.substring(2));
 		spinHr.setValue(args.startTime/3600);
 		spinMin.setValue((args.startTime%3600)/60);
 		spinSec.setValue(args.startTime%60);
@@ -507,5 +535,41 @@ public class TextGUI implements ActionListener
 	private boolean ValidateProjectFile(File file)
 	{
 		return file.getName().endsWith(".vam");
+	}
+
+	private String ColorToString(Color color)
+	{
+		String str = Integer.toHexString(color.getRGB());
+		String alpha = null;
+		if(str.length() > 6)
+			{
+				alpha = str.substring(0,2);
+				str = str.substring(2);
+			}
+		while(str.length() < 6)
+			str = "0"+str;
+		if(alpha != null)
+			str+=alpha;
+		return str;
+	}
+	private Color StringToColor(String str)
+	{
+		String alpha = null;
+		if(str.length() > 6)
+			{
+				alpha = str.substring(6);
+				str = str.substring(0,6);
+			}
+		
+		if(alpha != null)
+			str = alpha+str;
+		return new Color((int)Long.parseLong(str,16), true);
+	}
+
+	public void Completed()
+	{
+		progress.setValue(0);
+		progress.setString("");
+		btnDo.setEnabled(true);
 	}
 }

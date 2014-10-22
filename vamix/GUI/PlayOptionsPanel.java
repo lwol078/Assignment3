@@ -19,6 +19,7 @@ import uk.co.caprica.vlcj.player.*;
 public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeListener
 {
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
+	private JLabel labelTimer;
 	private JButton btnPlay, btnPause, btnMute;
 	private JButton btnSkipBack, btnSkipForward;
 	private JSlider volumeSlider, playSlider;
@@ -64,8 +65,8 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 			}
 			public void paused(MediaPlayer mP)
 			{
+				setEnableAll(false);
 				btnPlay.setEnabled(true);
-				btnPause.setEnabled(false);
 				timerFastForward.cancel();
 				timerRewind.cancel();
 			}
@@ -85,6 +86,7 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 					playSlider.setValue(pos);
 					playSliderLock = false;
 				}
+				labelTimer.setText(LongToTime(mP.getTime())+"/"+LongToTime(mP.getLength()));
 			}
 		});
 		timerFastForward = new Timer();
@@ -121,11 +123,16 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		playSlider.addChangeListener(this);
 
 		JLabel labelVolume = new JLabel(" Volume: ");
+		labelTimer = new JLabel();
+
 		layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         layout.setHorizontalGroup(
         	layout.createParallelGroup()
-        		.addComponent(playSlider)
+        		.addGroup(layout.createSequentialGroup()
+        			.addComponent(playSlider)
+        			.addComponent(labelTimer)
+        			)
 	        	.addGroup(layout.createSequentialGroup()
 		        	.addComponent(btnPlay)
 		        	.addComponent(btnPause)
@@ -139,7 +146,10 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
         	);
         layout.setVerticalGroup(
         	layout.createSequentialGroup()
-        		.addComponent(playSlider)
+        		.addGroup(layout.createParallelGroup()
+        			.addComponent(playSlider)
+        			.addComponent(labelTimer)
+        			)
         		.addGroup(layout.createParallelGroup()
 	    			.addComponent(btnPlay)
 		        	.addComponent(btnPause)
@@ -243,8 +253,10 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 			if (!playSliderLock)
 			{
 				mediaLock = true;
-				mediaPlayerComponent.getMediaPlayer().setPosition((float)playSlider.getValue()/100.0f);
-				mediaPlayerComponent.getMediaPlayer().setPause(true);
+				MediaPlayer mP = mediaPlayerComponent.getMediaPlayer();
+				mP.setPosition((float)playSlider.getValue()/100.0f);
+				mP.setPause(true);
+				labelTimer.setText(LongToTime(mP.getTime())+"/"+LongToTime(mP.getLength()));
 				mediaLock = false;
 			}
 		}
@@ -255,5 +267,13 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		Image newimg = img.getScaledInstance( 20, 20,  java.awt.Image.SCALE_SMOOTH ) ;  
 	    icon = new ImageIcon( newimg );
 		return icon;
+	}
+
+	private String LongToTime(long time)
+	{
+		long hrs =  time / (1000*60*60);
+		long mins = (time % (1000*60*60)) / (1000*60);
+		long secs = (time % (1000*60) / 1000);
+		return hrs+":"+mins+":"+secs;
 	}
 }

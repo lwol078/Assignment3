@@ -90,6 +90,7 @@ public class DrawCommand
 					JOptionPane.showMessageDialog(null,"Done");
 				else
 					JOptionPane.showMessageDialog(null,"Error: exit status "+ exitStatus);
+				gui.Completed();
 			}
 			catch (Exception ex)
 			{}
