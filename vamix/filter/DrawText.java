@@ -2,7 +2,9 @@ package vamix.filter;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 
 import vamix.GUI.TextGUI;
 import vamix.work.*;
@@ -12,16 +14,16 @@ public class DrawText extends Filter
 	public String text;
 	public String fontName;
 	public Point p;
-	public String color;
+	public Color color;
 	public int size;
 	
 	public DrawText(Project project, String name)
 	{
-		super(project, name, Type.DrawText);
+		super(project, name, Type.DRAWTEXT);
 		text = "wooglywooglywoo";
-		fontName = "";
+		fontName = "Ubuntu-R.ttf";
 		p = new Point(0,0);
-		color = "ffffff";
+		color = StringToColor("000000");
 		size = 20;
 	}
 	
@@ -30,7 +32,7 @@ public class DrawText extends Filter
 	{
 		String filter;
 		int end = startTime+duration;
-		filter = "drawtext=fontcolor="+color+":fontfile=vamix/fonts/"+fontName
+		filter = "drawtext=fontcolor="+ColorToString(color)+":fontfile=vamix/fonts/"+fontName
 				+":fontsize="+size+":text='"+text+"':x="+p.x+":y="+p.y+":draw='gt(t,"+startTime+")*lt(t,"+end+")'";
 		return filter;
 	}
@@ -43,9 +45,9 @@ public class DrawText extends Filter
 		str += text+"\n";
 		str += p.x+" "+p.y+"\n";
 		str += fontName +"\n";
-		str += color+"\n";
+		str += ColorToString(color)+"\n";
 		str += size+"\n";
-		str += startTime+"\n";
+		str += TimeToString(startTime)+"\n";
 		str += duration+"\n";
 		return str;
 	}
@@ -73,9 +75,25 @@ public class DrawText extends Filter
 				alpha = str.substring(6);
 				str = str.substring(0,6);
 			}
-		
+		str = "ff"+str;
 		if(alpha != null)
 			str = alpha+str;
 		return new Color((int)Long.parseLong(str,16), true);
+	}
+	public static DrawText Load(Project p, BufferedReader openReader) throws IOException
+	{
+		String name = openReader.readLine();
+		DrawText d = new DrawText(p,name);
+		d.text = openReader.readLine();
+		String str = openReader.readLine();
+		String[] point = str.split(" ");
+		d.p = new Point(Integer.parseInt(point[0]), Integer.parseInt(point[1]));
+		d.fontName = openReader.readLine();
+		d.color = StringToColor(openReader.readLine());
+		d.size = Integer.parseInt(openReader.readLine());
+		d.startTime = StringToTime(openReader.readLine());
+		d.duration = Integer.parseInt(openReader.readLine());
+		
+		return d;
 	}
 }
