@@ -40,12 +40,13 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		mediaPlayerComponent = mPC;
 		
 		//fetch icons
-		playIcon = resizeIcon(new ImageIcon("vamix/icons/playBtn.png"));
-		pauseIcon = resizeIcon(new ImageIcon("vamix/icons/pauseBtn.png"));
-		ffIcon = resizeIcon(new ImageIcon("vamix/icons/ffBtn.png"));
-		rwIcon = resizeIcon(new ImageIcon("vamix/icons/rwBtn.png"));
-		muteIcon = resizeIcon(new ImageIcon("vamix/icons/muteBtn.png"));
-		unmuteIcon = resizeIcon(new ImageIcon("vamix/icons/unmuteBtn.png"));
+		
+		playIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/playBtn.png")));
+		pauseIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/pauseBtn.png")));
+		ffIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/ffBtn.png")));
+		rwIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/rwBtn.png")));
+		muteIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/muteBtn.png")));
+		unmuteIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/unmuteBtn.png")));
 
 		mPC.getMediaPlayer().addMediaPlayerEventListener(new MediaPlayerEventAdapter()
 		{
@@ -274,6 +275,15 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		long hrs =  time / (1000*60*60);
 		long mins = (time % (1000*60*60)) / (1000*60);
 		long secs = (time % (1000*60) / 1000);
-		return hrs+":"+mins+":"+secs;
+		String sHrs = ""+hrs;
+		if(sHrs.length() < 2)
+			sHrs = "0"+sHrs;
+		String sMins = ""+mins;
+		if(sMins.length() < 2)
+			sMins = "0"+sMins;
+		String sSecs = ""+secs;
+		if(sSecs.length() < 2)
+			sSecs = "0"+sSecs;
+		return sHrs+":"+sMins+":"+sSecs;
 	}
 }

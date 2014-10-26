@@ -9,6 +9,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
+import vamix.filter.Filter;
+import vamix.filter.DrawText;
 import vamix.work.*;
 
 /**	TextGUI
@@ -18,23 +20,27 @@ public class TextGUI extends JFrame implements ActionListener
 {
 	private final int MAXLENGTH = 40;
 
-	private JLabel labelFont,labelColor,labelX,labelY,labelText,labelTime,labelDuration, labelSize, labelSource;
-	private JComboBox<String> comboFont;
-	private JSpinner spinX, spinY, spinHr, spinMin, spinSec, spinDur, spinSize;
-	private JTextField text;
-	private JButton btnSave, btnChoose, btnOpen, btnDo, btnColor;
+	private JLabel labelSource;
+	private JButton btnSave, btnChoose, btnOpen, btnDo, btnAddFilter,btnRemoveFilter;
 	private JProgressBar progress;
+	private JTabbedPane tabbedPane;
 
 	private JFrame parent;
-	private JPanel mainPanel, formatPanel, positionPanel, timePanel, sourcePanel, leftPanel, rightPanel;
+	private JPanel mainPanel, sourcePanel, leftPanel, rightPanel;
 	private File sourceFile;
-	private Color selectedColor;
+	
+	private Project currentProject;
+	private JScrollPane filterScroll;
+	private JList<Filter> filterList;
+	private DefaultListModel<Filter> filterModel;
+	private Filter currentFilter;
 
 	public TextGUI(JFrame frame, File source)
 	{
 		super("Edit Text");
 		sourceFile = source;
-		selectedColor = new Color(0,0,0);
+		currentProject = new Project("NewProject");
+		currentFilter = null;
 		if(sourceFile == null)
 			labelSource = new JLabel("none selected");
 		else if (!ValidateVideoFile(sourceFile))
@@ -50,6 +56,7 @@ public class TextGUI extends JFrame implements ActionListener
 				name = "..."+name.substring(name.length()-20);
 			labelSource = new JLabel(name);
 		}
+		
 		parent = frame;
 		setSize(800,500);
 		setVisible(true);
@@ -58,9 +65,8 @@ public class TextGUI extends JFrame implements ActionListener
 		leftPanel = new JPanel();
 		rightPanel = new JPanel();
 		sourcePanel = new JPanel();
-		formatPanel = new JPanel();
-		positionPanel = new JPanel();
-		timePanel = new JPanel();
+		tabbedPane = new JTabbedPane();
+		
 
 		setContentPane(mainPanel);
 
@@ -68,12 +74,6 @@ public class TextGUI extends JFrame implements ActionListener
 		getContentPane().setLayout(layout);
 		GroupLayout srcLayout = new GroupLayout(sourcePanel);
 		sourcePanel.setLayout(srcLayout);
-		GroupLayout formatLayout = new GroupLayout(formatPanel);
-		formatPanel.setLayout(formatLayout);
-		GroupLayout posLayout = new GroupLayout(positionPanel);
-		positionPanel.setLayout(posLayout);
-		GroupLayout timeLayout = new GroupLayout(timePanel);
-		timePanel.setLayout(timeLayout);
 		GroupLayout leftLayout = new GroupLayout(leftPanel);
 		leftPanel.setLayout(leftLayout);
 		GroupLayout rightLayout = new GroupLayout(rightPanel);
@@ -85,66 +85,7 @@ public class TextGUI extends JFrame implements ActionListener
 		btnOpen = new JButton("Open project");
 		btnOpen.addActionListener(this);
 
-		labelFont = new JLabel("Font:");
-		//Load fonts from file
-		Vector<String> fonts = new Vector<String>();
-		final File fontFolder = new File("vamix/fonts");
-		for (final File file : fontFolder.listFiles())
-		{
-			if (!file.isDirectory())
-			{
-				fonts.add(file.getName());
-			}
-		}
-
-		comboFont = new JComboBox<String>(fonts);
-		if(comboFont.getItemCount()!= 0)
-			comboFont.setSelectedIndex(0);
-		comboFont.setMaximumSize(new Dimension(100,20));
-
-		labelColor = new JLabel("Color:");
-		btnColor = new JButton("Select");
-		btnColor.addActionListener(this);
-
-		labelSize = new JLabel("Size:");
-		spinSize = new JSpinner(new SpinnerNumberModel(10,1,50,1));
-		spinSize.setMaximumSize(new Dimension(30,20));
-
-		labelX = new JLabel("x:");
-		spinX = new JSpinner(new SpinnerNumberModel(0,0,100,1));
-		spinX.setMaximumSize(new Dimension(30,20));
-
-		labelY = new JLabel("y:");
-		spinY = new JSpinner(new SpinnerNumberModel(0,0,100,1));
-		spinY.setMaximumSize(new Dimension(30,20));
-
-
-		text = new JTextField(40);
-		text.setMaximumSize(new Dimension(335,40));
-		text.setDocument(new PlainDocument()
-		{
-			public void insertString(int offs, String str, AttributeSet a) throws BadLocationException
-			{
-				if (str == null)
-			      return;
-
-			    if ((getLength() + str.length()) <= 40)
-			      super.insertString(offs, str, a);
-			}
-
-		});
-
-		labelTime = new JLabel("Time:");
-		spinHr = new JSpinner(new SpinnerNumberModel(0,0,60,1));
-		spinHr.setMaximumSize(new Dimension(50,20));
-		spinMin = new JSpinner(new SpinnerNumberModel(0,0,60,1));
-		spinMin.setMaximumSize(new Dimension(50,20));
-		spinSec = new JSpinner(new SpinnerNumberModel(0,0,60,1));
-		spinSec.setMaximumSize(new Dimension(50,20));
-
-		labelDuration = new JLabel("Duration (s):");
-		spinDur = new JSpinner(new SpinnerNumberModel(0,0,null,1));
-		spinDur.setMaximumSize(new Dimension(50,20));
+		
 
 		btnSave = new JButton("Save Project");
 		btnSave.addActionListener(this);
@@ -156,37 +97,42 @@ public class TextGUI extends JFrame implements ActionListener
 		progress.setString("");
 		progress.setStringPainted(true);
 		progress.setMaximumSize(new Dimension(160,25));
-
+		
+		filterModel = new DefaultListModel<Filter>();
+		filterList = new JList<Filter>(filterModel);
+		filterList.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) 
+			{
+				currentFilter = filterList.getSelectedValue();
+				Set(currentFilter);
+			}
+		});
+		filterScroll = new JScrollPane(filterList);
+		filterScroll.setMaximumSize(new Dimension(250,300));
+		filterScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		
+		btnAddFilter = new JButton("Add Filter");
+        btnAddFilter.addActionListener(this);
+        
+        btnRemoveFilter = new JButton("Remove Filter");
+        btnRemoveFilter.addActionListener(this);
+        
 		//Main panel layout
         MainLayout(layout);
 
         //Source panel layout
         SourceLayout(srcLayout);
 
-
-        //Format panel layout
-        FormatLayout(formatLayout);
-
-        //Position panel layout
-        PositionLayout(posLayout);
-
-        //Time panel layout
-        TimeLayout(timeLayout);
-
         //Right layout
         RightLayout(rightLayout);
 
         //Left layout
-        LeftLayout(leftLayout);
+        //LeftLayout(leftLayout);
 
-        Border etched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-        sourcePanel.setBorder(BorderFactory.createTitledBorder(etched,"Source"));
-        formatPanel.setBorder(BorderFactory.createTitledBorder(etched,"Format"));
-        positionPanel.setBorder(BorderFactory.createTitledBorder(etched,"Position"));
-        text.setBorder(BorderFactory.createTitledBorder(etched,"Text (Max 40 characters):"));
-        timePanel.setBorder(BorderFactory.createTitledBorder(etched,"Time"));
-
-
+        
+        sourcePanel.setBorder(BorderFactory.createTitledBorder("Source"));
+        filterScroll.setBorder(BorderFactory.createTitledBorder("Filters"));
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -198,10 +144,12 @@ public class TextGUI extends JFrame implements ActionListener
 			else
 			{
 				JFileChooser jFC = new JFileChooser();
+				jFC.setSelectedFile(new File(currentProject.name));
 				int returnVal = jFC.showSaveDialog(this);
 				if(returnVal == JFileChooser.APPROVE_OPTION) 
 				{
-					DrawCommandArgs args = new DrawCommandArgs();
+					
+					/*DrawCommandArgs args = new DrawCommandArgs();
 					args.sourceFile = sourceFile;
 					args.text = text.getText();
 					args.p = new Point((int)spinX.getValue(),(int)spinX.getValue());
@@ -211,17 +159,36 @@ public class TextGUI extends JFrame implements ActionListener
 					args.size = (int)spinSize.getValue();
 					
 					args.fontName = (String)comboFont.getSelectedItem();
-					args.gui = this;
+					args.gui = this;*/
 					File outputFile = jFC.getSelectedFile();
 					if(!outputFile.getName().endsWith(".vam"))
 						outputFile = new File(outputFile.getAbsolutePath()+".vam");
-					new DrawCommand(args).Save(args, outputFile);
+					if(outputFile.exists())
+						{
+						Object[] options = { "OVERWRITE", "CANCEL" };
+						int value = JOptionPane.showOptionDialog(null, "Project file already exists. Overwrite?", "Warning",JOptionPane.DEFAULT_OPTION, 
+								JOptionPane.WARNING_MESSAGE,null, options, options[0]);
+						if(value == JOptionPane.CANCEL_OPTION)
+							return;
+						}
+					
+					
+					try
+					{
+						FileWriter saveWriter = new FileWriter(outputFile.getAbsolutePath());
+						saveWriter.write(currentProject.SaveText());
+						saveWriter.close();
+					}
+					catch(Exception err)
+					{
+						JOptionPane.showMessageDialog(null,"Error "+err.getMessage());
+					}
 				}
 			}
 		}
 		else if(e.getSource() == btnDo)
 		{
-			if(sourceFile == null)
+			/*if(sourceFile == null)
 				JOptionPane.showMessageDialog(null,"Select a valid source file");
 			else
 			{
@@ -241,10 +208,10 @@ public class TextGUI extends JFrame implements ActionListener
 					args.fontName = (String)comboFont.getSelectedItem();
 					args.gui = this;
 
-					new DrawCommand(args).Execute();
+					new DrawCommand2(args).Execute();
 					btnDo.setEnabled(false);
 				}
-			}
+			}*/
 		}
 		else if(e.getSource() == btnChoose)
 		{
@@ -271,7 +238,7 @@ public class TextGUI extends JFrame implements ActionListener
 		}
 		else if(e.getSource() == btnOpen)
 		{
-			JFileChooser jFC = new JFileChooser();
+			/*JFileChooser jFC = new JFileChooser();
 			int returnVal = jFC.showOpenDialog(this);
 			if(returnVal == JFileChooser.APPROVE_OPTION)
 			{
@@ -282,16 +249,18 @@ public class TextGUI extends JFrame implements ActionListener
 				{
 					Set(new DrawCommandArgs(project));
 				}
-			}
+			}*/
 		}
-		else if(e.getSource() == btnColor)
+		else if(e.getSource() == btnAddFilter)
 		{
-		Color newColor = JColorChooser.showDialog(
-                    null,
-                    "Choose Text Color",
-                    selectedColor);
-		if(newColor != null)
-			selectedColor = newColor;
+			String name = JOptionPane.showInputDialog("New filter name:");
+			Filter toAdd = new DrawText(currentProject,name);
+			filterModel.addElement(toAdd);
+		}
+		else if(e.getSource() == btnRemoveFilter)
+		{
+			Filter toRemove = filterList.getSelectedValue();
+			filterModel.removeElement(toRemove);
 		}
 	}
 
@@ -322,100 +291,6 @@ public class TextGUI extends JFrame implements ActionListener
         	);
 	}
 
-	public void FormatLayout(GroupLayout layout)
-	{
-		layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-        layout.setHorizontalGroup(
-        	layout.createSequentialGroup()
-        		.addGroup(layout.createParallelGroup()
-    				.addComponent(labelFont)
-    				.addComponent(labelColor)
-    				.addComponent(labelSize)
-    				)
-    			.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-    				.addComponent(comboFont)
-    				.addComponent(btnColor)
-    				.addComponent(spinSize)
-    				)
-    		);
-        layout.setVerticalGroup(
-        	layout.createSequentialGroup()
-        		.addGroup(layout.createParallelGroup()
-    				.addComponent(labelFont)
-    				.addComponent(comboFont)
-    				)
-    			.addGroup(layout.createParallelGroup()
-    				.addComponent(labelColor)
-    				.addComponent(btnColor)
-    				)
-    			.addGroup(layout.createParallelGroup()
-    				.addComponent(labelSize)
-    				.addComponent(spinSize)
-    				)
-    		);
-	}
-
-	public void PositionLayout(GroupLayout layout)
-	{
-		layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-        layout.setHorizontalGroup(
-        	layout.createSequentialGroup()
-        		.addComponent(labelX)
-        		.addComponent(spinX)
-        		.addComponent(labelY)
-        		.addComponent(spinY)
-        	);
-        layout.setVerticalGroup(
-        	layout.createParallelGroup()
-        		.addComponent(labelX)
-        		.addComponent(spinX)
-        		.addComponent(labelY)
-        		.addComponent(spinY)
-        	);
-	}
-
-	public void TimeLayout(GroupLayout layout)
-	{
-		JLabel colon1 = new JLabel(":");
-        JLabel colon2 = new JLabel(":");
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-        layout.setHorizontalGroup(
-        	layout.createSequentialGroup()
-        		.addGroup(layout.createParallelGroup()
-        			.addComponent(labelTime)
-        			.addComponent(labelDuration)
-        			)
-        		.addComponent(spinHr)
-        		.addComponent(colon1)
-        		.addComponent(spinMin)
-        		.addComponent(colon2)
-        		.addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-        			.addComponent(spinSec)
-        			.addComponent(spinDur)
-        			)
-        		
-        	);
-        layout.setVerticalGroup(
-        	layout.createSequentialGroup()
-	        	.addGroup(layout.createParallelGroup()
-	        		.addComponent(labelTime)
-	        		.addComponent(spinHr)
-	        		.addComponent(colon1)
-	        		.addComponent(spinMin)
-	        		.addComponent(colon2)
-	        		.addComponent(spinSec)
-	        		)
-        		.addGroup(layout.createParallelGroup()
-        			.addComponent(labelDuration)
-        			.addComponent(spinDur)
-        			)
-        		
-        	);
-	}
-
 	public void SourceLayout(GroupLayout layout)
 	{
 		layout.setAutoCreateGaps(true);
@@ -432,27 +307,6 @@ public class TextGUI extends JFrame implements ActionListener
     		);
 	}
 
-	public void LeftLayout(GroupLayout layout)
-	{
-		layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-        layout.setHorizontalGroup(
-        	layout.createParallelGroup()
-        		.addComponent(formatPanel)
-				.addComponent(positionPanel)
-				.addComponent(text)
-				.addComponent(timePanel)
-        	);
-        layout.setVerticalGroup(
-        	layout.createSequentialGroup()
-    			.addComponent(formatPanel)
-    			.addComponent(positionPanel)
-    			.addComponent(text)
-    			.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING))
-    			.addComponent(timePanel)
-        	);
-	}
-
 	public void RightLayout(GroupLayout layout)
 	{
 		layout.setAutoCreateGaps(true);
@@ -463,6 +317,11 @@ public class TextGUI extends JFrame implements ActionListener
 		        .addGroup(layout.createSequentialGroup()
 		        	.addComponent(btnOpen)
 			        .addComponent(btnSave)
+	        		)
+	        	.addComponent(filterScroll)
+	        	.addGroup(layout.createSequentialGroup()
+	    			.addComponent(btnAddFilter)
+	    			.addComponent(btnRemoveFilter)
 	        		)
 		        .addGroup(layout.createSequentialGroup()
 	    			.addComponent(btnDo)
@@ -476,6 +335,11 @@ public class TextGUI extends JFrame implements ActionListener
 		        	.addComponent(btnOpen)
 			        .addComponent(btnSave)
 	        		)
+	        	.addComponent(filterScroll)
+	        	.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+    				.addComponent(btnAddFilter)
+    				.addComponent(btnRemoveFilter)
+    				)
     			.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
     				.addComponent(btnDo)
     				.addComponent(progress)
@@ -483,7 +347,7 @@ public class TextGUI extends JFrame implements ActionListener
         	);
 	}
 
-	public void Set(DrawCommandArgs args)
+	/*public void Set(DrawCommandArgs args)
 	{
 		sourceFile = args.sourceFile;
 		String name;
@@ -504,8 +368,17 @@ public class TextGUI extends JFrame implements ActionListener
 		spinDur.setValue(args.duration);
 		spinSize.setValue(args.size);
 		comboFont.setSelectedItem(args.fontName);
+	}*/
+	
+	public void Set(Filter f)
+	{
+		switch(f.type)
+		{
+		case DrawText: SetDrawText((DrawText) f); break;
+			
+		}
 	}
-
+	
 	private boolean ValidateVideoFile(File file)
 	{
 		try 
@@ -527,39 +400,15 @@ public class TextGUI extends JFrame implements ActionListener
 		return file.getName().endsWith(".vam");
 	}
 
-	private String ColorToString(Color color)
-	{
-		String str = Integer.toHexString(color.getRGB());
-		String alpha = null;
-		if(str.length() > 6)
-			{
-				alpha = str.substring(0,2);
-				str = str.substring(2);
-			}
-		while(str.length() < 6)
-			str = "0"+str;
-		if(alpha != null)
-			str+=alpha;
-		return str;
-	}
-	private Color StringToColor(String str)
-	{
-		String alpha = null;
-		if(str.length() > 6)
-			{
-				alpha = str.substring(6);
-				str = str.substring(0,6);
-			}
-		
-		if(alpha != null)
-			str = alpha+str;
-		return new Color((int)Long.parseLong(str,16), true);
-	}
-
 	public void Completed()
 	{
 		progress.setValue(0);
 		progress.setString("");
 		btnDo.setEnabled(true);
+	}
+	
+	public Filter GetFilter()
+	{
+		return currentFilter;
 	}
 }
