@@ -206,6 +206,8 @@ public class ReplaceAudioGUI extends JFrame implements ActionListener {
 			remove(replaceBtn);
 			cancelBtn = new JButton("Cancel");
 			cancelBtn.addActionListener(this);
+			cancelBtn.setForeground(Color.white);
+			cancelBtn.setBackground(Color.red);
 			c.weightx = 0.3;
 			c.weighty = 0.3;
 			c.ipadx = 40;

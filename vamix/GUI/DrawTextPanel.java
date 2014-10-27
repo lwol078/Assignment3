@@ -59,7 +59,6 @@ public class DrawTextPanel extends JPanel
 
 	public DrawTextPanel(TextGUI argParent)
 	{
-		//setMaximumSize(new Dimension(300,600));
 		parent = argParent;
 		selectedColor = new Color(0,0,0);
 

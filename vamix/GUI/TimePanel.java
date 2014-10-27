@@ -49,7 +49,7 @@ public class TimePanel extends JPanel
 
 
 		labelDuration = new JLabel("Duration (s):");
-		spinDur = new JSpinner(new SpinnerNumberModel(0,0,null,1));
+		spinDur = new JSpinner(new SpinnerNumberModel(10,0,null,1));
 		spinDur.setMaximumSize(new Dimension(50,20));
 		spinDur.addChangeListener(new ChangeListener(){
 			@Override

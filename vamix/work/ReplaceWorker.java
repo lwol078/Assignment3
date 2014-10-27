@@ -25,7 +25,7 @@ public class ReplaceWorker extends SwingWorker<Integer, String> {
 	private int totalFrames = 0;
 	private File videoFile, audioFile, outDirectory;
 	private String outFilename;
-	
+
 	public ReplaceWorker(ReplaceAudioGUI gui, File videoFile, File audioFile, File outDirectory, String outFilename) {
 		this.gui = gui;
 		this.videoFile = videoFile;
@@ -67,7 +67,9 @@ public class ReplaceWorker extends SwingWorker<Integer, String> {
 		String frames = chunks.get(0).replace("frame=", "").trim();
 		frames = frames.split(" ")[0];
 		int frameCount = Integer.parseInt(frames);
-		int progress = frameCount*100/totalFrames;
+		int progress =  0;
+		if(totalFrames != 0)
+			progress = frameCount*100/totalFrames;
 		gui.setProgressBar(progress);
 	}
 

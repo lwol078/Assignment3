@@ -202,6 +202,8 @@ public class OverlayAudioGUI extends JFrame implements ActionListener {
 			remove(overlayBtn);
 			cancelBtn = new JButton("Cancel");
 			cancelBtn.addActionListener(this);
+			cancelBtn.setForeground(Color.white);
+			cancelBtn.setBackground(Color.red);
 			c.weightx = 0.3;
 			c.weighty = 0.3;
 			c.ipadx = 40;
