@@ -92,7 +92,10 @@ public class DownloadAudioGUI extends JFrame implements ActionListener, Download
 		}
 		
 	}
-
+	/**
+	 * Sets up worker for download
+	 * Then begins download
+	 */
 	public void SetUpDownload() {
 		
 		worker = new DownloadWorker(this, url.getText());

@@ -127,6 +127,7 @@ public class ExtractAudioGUI extends JFrame implements ActionListener {
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
 				extractFile = chooser.getSelectedFile();
 				try {
+					//check if has audio stream
 					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + extractFile.toString() + "\"" + " 2>&1 | grep -q -w Audio:" );
 					Process process = builder.start();
 					process.waitFor();

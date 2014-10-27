@@ -95,6 +95,7 @@ public class ReplaceWorker extends SwingWorker<Integer, String> {
 
 			String line = null;
 			while ((line = stdout.readLine()) != null) {
+				//find output frame= <frame>
 				if (line.contains("frame=")) {
 					String frames = line.replace("frame=", "").trim();
 					frames = frames.split(" ")[0];

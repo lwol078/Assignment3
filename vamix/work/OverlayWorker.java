@@ -82,7 +82,11 @@ public class OverlayWorker extends SwingWorker<Integer, String>{
 
 		}
 	}
-
+	/**
+	 * videoFrameCount(File videoFile)
+	 * @param videoFile
+	 * @return framecount of file
+	 */
 	public int videoFrameCount(File videoFile) {
 
 		int frameCount = 0;

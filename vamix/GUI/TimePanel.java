@@ -10,14 +10,20 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+/**
+ * TimePanel
+ * @author luke
+ * Useful reusable panel for use in FilterGUI
+ * Every filter needs one, as all have start/duration 
+ */
 public class TimePanel extends JPanel 
 {
 	public boolean valueLock;
 	private JLabel labelTime,labelDuration;
-	private TextGUI gui;
+	private FilterGUI gui;
 	public JSpinner spinHr, spinMin, spinSec, spinDur;
 
-	public TimePanel(TextGUI gui)
+	public TimePanel(FilterGUI gui)
 	{
 		valueLock = false;
 		this.gui = gui;
@@ -105,10 +111,16 @@ public class TimePanel extends JPanel
 				);
 	}
 	
+	/**
+	 * Update(int startTime, int duration)
+	 * @param startTime
+	 * @param duration
+	 * Updates spinners to proper values
+	 */
 	public void Update(int startTime, int duration)
 	{
 		//Lock valueLock so spinners dont send msg to update
-				//	filter values
+		//	filter values
 		valueLock = true;
 		spinHr.setValue(startTime/3600);
 		spinMin.setValue((startTime%3600)/60);

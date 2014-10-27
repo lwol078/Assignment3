@@ -93,7 +93,9 @@ public class DownloadVideoGUI extends JFrame implements ActionListener, Download
 		}
 		
 	}
-
+	/**
+	 * Sets up and executes worker command
+	 */
 	public void SetUpDownload() {
 		
 		worker = new DownloadWorker(this, url.getText());

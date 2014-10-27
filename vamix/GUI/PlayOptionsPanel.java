@@ -40,7 +40,6 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 		mediaPlayerComponent = mPC;
 		
 		//fetch icons
-		
 		playIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/playBtn.png")));
 		pauseIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/pauseBtn.png")));
 		ffIcon = resizeIcon(new ImageIcon(getClass().getResource("/vamix/icons/ffBtn.png")));
@@ -80,6 +79,8 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 			{
 				if(!mediaLock)
 				{
+					//lock so doesn't loop
+					//->stops listener from changing position again
 					playSliderLock = true;
 					int pos = (int)(100*newPosition);
 					if(pos < 0)
@@ -269,7 +270,13 @@ public class PlayOptionsPanel extends JPanel implements ActionListener, ChangeLi
 	    icon = new ImageIcon( newimg );
 		return icon;
 	}
-
+	
+	/**
+	 * LongToTime(long time)
+	 * @param time time to get string from
+	 * @return time in string hh:mm:ss format
+	 * Utility function to get stringform time
+	 */
 	private String LongToTime(long time)
 	{
 		long hrs =  time / (1000*60*60);

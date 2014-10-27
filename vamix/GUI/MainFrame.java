@@ -12,9 +12,9 @@ import vamix.work.*;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 
-/** Mainframe
- *  The main frame class for the vamix. It contains a menu to access the editing functions,
- *   a panel containing the play options and the media player
+/**Mainframe
+ * The main frame class for the vamix. It contains a menu to access the editing functions,
+ *  a panel containing the play options and the media player
  */
 public class MainFrame extends JFrame implements ActionListener
 {
@@ -29,7 +29,7 @@ public class MainFrame extends JFrame implements ActionListener
 
     private EmbeddedMediaPlayerComponent mediaPlayerComponent;
     private File currentFile;
-    private TextGUI textGUI;
+    private FilterGUI filterGUI;
     private SubtitleFrame subtitles;
 
     /** Constructor
@@ -41,7 +41,7 @@ public class MainFrame extends JFrame implements ActionListener
 
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         currentFile = null;
-        textGUI = null;
+        filterGUI = null;
         subtitles = null;
 
 		setLocation(100, 100);
@@ -50,7 +50,7 @@ public class MainFrame extends JFrame implements ActionListener
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
-        //Release media player at end of program and set size on startup
+        //Release media player at end of program and set size on startup/resize
         addWindowListener(new WindowAdapter()
             {
                 public void windowClosing(WindowEvent e)
@@ -179,24 +179,26 @@ public class MainFrame extends JFrame implements ActionListener
         }
         else if (e.getSource() == filterItem)
         {
-            if(textGUI == null)
+        	//only allow one filterGUI
+            if(filterGUI == null)
             {
-                textGUI = new TextGUI(this, currentFile);
-                textGUI.addWindowListener(new WindowAdapter()
+                filterGUI = new FilterGUI(this, currentFile);
+                filterGUI.addWindowListener(new WindowAdapter()
                 {
                     public void windowClosing(WindowEvent e)
                     {
-                        textGUI = null;
+                        filterGUI = null;
                     }
                 });
             }
         }
         else if (e.getSource() == subtitleItem)
         {
-        	if(!TextGUI.ValidateVideoFile(currentFile))
+        	if(!FilterGUI.ValidateVideoFile(currentFile))
         			JOptionPane.showMessageDialog(this, "Begin playing a track to be able to add subtitles");
         	else if(subtitles == null)
             {
+        		//only allow one subtitles
                 subtitles = new SubtitleFrame(this,currentFile);
                 subtitles.addWindowListener(new WindowAdapter()
                 {

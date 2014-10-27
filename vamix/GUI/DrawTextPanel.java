@@ -42,9 +42,14 @@ import javax.swing.text.PlainDocument;
 
 import vamix.filter.DrawText;
 
+/**
+ * DrawTextPanel
+ * @author luke
+ * Contains cmponents to set/get information from a DrawText filter
+ */
 public class DrawTextPanel extends JPanel 
 {
-	private TextGUI parent;
+	private FilterGUI parent;
 	private JLabel labelFont,labelColor,labelX,labelY,labelText, labelSize;
 	private JComboBox<String> comboFont;
 	private JSpinner spinX, spinY, spinSize;
@@ -57,7 +62,7 @@ public class DrawTextPanel extends JPanel
 	private Vector<String> fonts;
 	public File fontFile;
 
-	public DrawTextPanel(TextGUI argParent)
+	public DrawTextPanel(FilterGUI argParent)
 	{
 		parent = argParent;
 		selectedColor = new Color(0,0,0);
@@ -76,8 +81,10 @@ public class DrawTextPanel extends JPanel
 		labelFont = new JLabel("Font:");
 
 		fonts = new Vector<String>();
+		//get font file
 		fontFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
 		if(fontFile.getName().endsWith(".jar"))
+			//go to parent file
 			fontFile = new File(fontFile.getParent());
 		fontFile = new File(fontFile.getAbsolutePath()+"/vamix/fonts");
 		while(!fontFile.exists())
@@ -100,6 +107,7 @@ public class DrawTextPanel extends JPanel
 			if(!f.isDirectory())
 				fonts.add(f.getName());
 		}
+		//set default font
 		DrawText.defaultFont=fonts.firstElement();
 
 		comboFont = new JComboBox<String>(fonts);
@@ -109,7 +117,7 @@ public class DrawTextPanel extends JPanel
 			@Override
 			public void itemStateChanged(ItemEvent arg0) 
 			{
-
+				//Set filter's fontname to absolute path
 				Filter().fontName = fontFile.getAbsolutePath()+"/"+comboFont.getSelectedItem();
 			}
 		});
@@ -291,6 +299,7 @@ public class DrawTextPanel extends JPanel
 		selectedColor = f.color;
 		if(selectedColor != null)
 		{
+			//Set so text is readable
 			text.setForeground(selectedColor);
 			text.setBackground(Inverse(selectedColor));
 		}
@@ -301,6 +310,11 @@ public class DrawTextPanel extends JPanel
 		String str = new File(f.fontName).getName();
 		comboFont.setSelectedItem(str);
 	}
+	
+	/**Filter()
+	 * Convenience method to get parent's filter in DrawText from
+	 * @return
+	 */
 	public DrawText Filter()
 	{
 		return ((DrawText)(parent.GetFilter()));

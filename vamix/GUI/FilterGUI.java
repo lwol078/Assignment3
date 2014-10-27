@@ -13,10 +13,10 @@ import java.util.*;
 import vamix.filter.*;
 import vamix.work.*;
 
-/**	TextGUI
- *	Contains all the gui elements that pop up when Edit Text is selected
+/**	FilterGUI
+ *	Contains all the gui elements that pop up when Filters is selected
  */
-public class TextGUI extends JFrame implements ActionListener
+public class FilterGUI extends JFrame implements ActionListener
 {
 	private final int MAXLENGTH = 40;
 
@@ -38,7 +38,7 @@ public class TextGUI extends JFrame implements ActionListener
 	private GroupLayout layout;
 	private boolean viewLock;
 
-	public TextGUI(MainFrame frame, File source)
+	public FilterGUI(MainFrame frame, File source)
 	{
 		super("Edit Text");
 		viewLock = false;
@@ -74,7 +74,8 @@ public class TextGUI extends JFrame implements ActionListener
 		tabbedPane.addTab("Text Overlay", drawTextPanel);
 		negatePanel = new NegatePanel(this);
 		tabbedPane.addTab("Negate", negatePanel);
-
+		
+		//setup tabbed pane with filters
 		tabbedPane.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent arg0)
@@ -272,7 +273,13 @@ public class TextGUI extends JFrame implements ActionListener
 			currentProject.RemoveFilter(toRemove);
 		}
 	}
-
+	
+	/**
+	 * setprogress(boolean bool)
+	 * @param bool
+	 * set the progress bar to look like its doing something if bool = true,
+	 * set it to stop otherwise
+	 */
 	public void setProgress(boolean bool)
 	{
 		progress.setIndeterminate(bool);
@@ -410,7 +417,12 @@ public class TextGUI extends JFrame implements ActionListener
 
 		pack();
 	}
-
+	
+	/**
+	 * ValidateVideoFile(File file)
+	 * @param file
+	 * @return if file is a valid video file
+	 */
 	public static boolean ValidateVideoFile(File file)
 	{
 		try 

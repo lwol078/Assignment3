@@ -5,12 +5,16 @@ import javax.swing.JPanel;
 import vamix.filter.DrawText;
 import vamix.filter.Negate;
 
+/**NegatePanel
+ * @author luke
+ * Panel which contains components to set/get Negate options
+ */
 public class NegatePanel extends JPanel 
 {
-	private TextGUI parent;
+	private FilterGUI parent;
 	private TimePanel timePanel;
 	
-	public NegatePanel(TextGUI gui)
+	public NegatePanel(FilterGUI gui)
 	{
 		parent = gui;
 		timePanel = new TimePanel(gui);

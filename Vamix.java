@@ -3,6 +3,11 @@ import vamix.GUI.MainFrame;
 import javax.swing.*;
 import javax.swing.UIManager.*;
 
+/**
+ * Vamix
+ * @author luke
+ *Main class, simply sets look and feel to nimbus if possible then runs the program
+ */
 public class Vamix
 {
 	public static void main(final String[] args) 
@@ -20,7 +25,10 @@ public class Vamix
 							break;
 						}
 					}
-				} catch (Exception e) {}
+				} catch (Exception e) 
+				{
+					//Otherwise just use default look and feel
+				}
 				MainFrame mainFrame =new MainFrame();
 			}
 		});

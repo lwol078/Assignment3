@@ -4,24 +4,25 @@ import javax.swing.*;
 import java.io.*;
 import java.util.*;
 import java.awt.Point;
-import vamix.GUI.TextGUI;
+import vamix.GUI.FilterGUI;
 import vamix.filter.Filter;
 import vamix.filter.Project;
 
 /**
  * FilterCommand
  * @author luke
- *
+ * Runs a command which makes a chain if filters based on a project
+ * and applies them to a video 
  */
 public class FilterCommand
 {
 	private Project project;
-	private TextGUI gui; 
+	private FilterGUI gui; 
 
 	private String ext;
 	private DrawCommandWorker worker;
 
-	public FilterCommand(Project p, TextGUI gui)
+	public FilterCommand(Project p, FilterGUI gui)
 	{
 		project = p;
 		this.gui = gui;
@@ -59,7 +60,7 @@ public class FilterCommand
 			String str = "";
 			for(int i = 0; i < project.NumFilters(); i++)
 			{	
-
+				//format: [in]filter1[temp1];[temp1]filter2[temp2];...filterLast[out];
 				if(i == 0)
 					str = "[in]";
 				else
@@ -80,18 +81,6 @@ public class FilterCommand
 			{
 				builder = new ProcessBuilder(processString);
 				Process process = builder.start();
-				/*Deprecated,made progressbar indeterminate instead as slowed computer too much
-				 * BufferedReader bR = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				String output = bR.readLine();
-				while(output != null)
-				{
-					if(isCancelled())
-					{
-						process.destroy();
-						break;
-					}
-					output = bR.readLine();
-				}*/
 				status = process.waitFor();
 				process.destroy();
 			}
@@ -128,28 +117,7 @@ public class FilterCommand
 		@Override
 		protected void process(List<Void> chunks)
 		{
-			/*Deprecated
-			if(gui != null)
-			{
-				String[] chunksSplit = chunks.get(0).split(" ");
-				for (int i = 0; i < chunksSplit.length-2; i++) 
-				{
-					if (chunksSplit[i].contains("frame=")) 
-					{
-						int progress = 0;
-						for(int j = i; j < chunksSplit.length; j++)
-						{
-							if(chunksSplit[j].matches("\\d\\d*"))
-								{
-								progress = Integer.parseInt(chunksSplit[j]);
-								break;
-								}
-						}
-						if(progress > 0 && progress < frameCount)
-							gui.setProgress((int)(100.0f*(float)progress/(float)frameCount));
-					}
-				}
-			}*/
+			//Tried having a progress bar but slowed computer too much
 		}
 	}
 	public void Execute()

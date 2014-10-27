@@ -4,14 +4,22 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-
-public class Negate extends Filter {
+/**
+ * Negate
+ * @author luke
+ *Filter which negates video pixels.
+ */
+public class Negate extends Filter 
+{
 
 	public Negate(Project p, String name)
 	{
 		super(p,name,Type.NEGATE);
 	}
 	
+	/**
+	 * FilterString() 
+	 */
 	@Override
 	public String FilterString() 
 	{
@@ -28,7 +36,10 @@ public class Negate extends Filter {
 		str+="[neg2][end2]overlay";
 		return str;
 	}
-
+	
+	/**
+	 * SaveText()
+	 */
 	@Override
 	public String SaveText() 
 	{
@@ -39,6 +50,13 @@ public class Negate extends Filter {
 		return str;
 	}
 	
+	/**
+	 * Load Negate filter from bufferedFileReader
+	 * @param p filter's parent project
+	 * @param openReader reader to read from
+	 * @return new Negate filter
+	 * @throws IOException
+	 */
 	public static Negate Load(Project p, BufferedReader openReader) throws IOException
 	{
 		String name = openReader.readLine();

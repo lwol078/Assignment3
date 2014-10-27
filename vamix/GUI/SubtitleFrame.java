@@ -36,6 +36,11 @@ import javax.swing.text.PlainDocument;
 import vamix.filter.Filter;
 import vamix.work.Subtitle;
 
+/**
+ * GUI for adding subtitles
+ * @author luke
+ *
+ */
 public class SubtitleFrame extends JFrame
 {
 	private JPanel timePanel, mainPanel;
@@ -62,9 +67,12 @@ public class SubtitleFrame extends JFrame
 		currentSubtitle = null;
 		listModel = new DefaultListModel<Subtitle>();
 		subtitleList.setModel(listModel);
+		
+		//get srt file
 		String srtStr = inFile.getAbsolutePath();
 		srtStr = srtStr.substring(0,srtStr.lastIndexOf('.'));
 		srtFile = new File(srtStr+".srt");
+		
 		valueLock = false;
 		
 		subtitles = new ArrayList<Subtitle>();
@@ -126,6 +134,7 @@ public class SubtitleFrame extends JFrame
 					writer.write("");
 					for(int i = 0; i < subtitles.size(); i++)
 					{
+						//Write time in form hh:mm:ss,000 --> hh:mm:ss,000
 						writer.append(i+"\n");
 						Subtitle s = subtitles.get(i);
 						String str = Filter.TimeToString(s.startTime)+",000 --> ";
@@ -170,7 +179,8 @@ public class SubtitleFrame extends JFrame
 
 				if ((getLength() + str.length()) <= 40)
 					super.insertString(offs, str, a);
-				String str2 = text.getText(); 
+				String str2 = text.getText();
+				//dont let it have two newlines, or else causes problems when saving/loading
 				if(str2.contains("\n\n"))
 					text.setText(str2.substring(0, str2.indexOf("\n\n")));
 			}
@@ -324,7 +334,7 @@ public class SubtitleFrame extends JFrame
 	{
 		if(currentSubtitle != null)
 		{
-		//prevent options from changing subtitle settings
+		//prevent options from changing subtitle settings due to their listeners
 		valueLock = true;
 		spinDur.setValue(subtitle.endTime-subtitle.startTime);
 		spinHr.setValue(subtitle.startTime/3600);
@@ -337,11 +347,13 @@ public class SubtitleFrame extends JFrame
 	
 	private void UpdateList(Subtitle newCurrent)
 	{
+		//reload list
 		listModel.clear();
 		Collections.sort(subtitles);
 		for(Subtitle s : subtitles)
 			if(s.text.length() > 0)
 				listModel.addElement(s);
+		
 		if(listModel.contains(newCurrent))
 			{
 			currentSubtitle = newCurrent;

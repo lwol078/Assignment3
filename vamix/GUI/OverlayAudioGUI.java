@@ -106,6 +106,7 @@ public class OverlayAudioGUI extends JFrame implements ActionListener {
 			} else if(returnVal == JFileChooser.APPROVE_OPTION) {
 				videoFile = chooser.getSelectedFile();
 				try {
+					//check is video file
 					ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c","avconv -i " + "\"" + videoFile + "\"" + " 2>&1 | grep -q -w Video:" );
 					Process process = builder.start();
 					process.waitFor();

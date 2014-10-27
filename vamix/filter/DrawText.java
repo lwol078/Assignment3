@@ -6,9 +6,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 
-import vamix.GUI.TextGUI;
+import vamix.GUI.FilterGUI;
 import vamix.work.*;
 
+/**
+ * DrawText
+ * @author luke
+ *Drawtext filter - draws text at a specified position with a certain format
+ *Also contains some utility functions
+ */
 public class DrawText extends Filter 
 {
 	public String text;
@@ -28,6 +34,10 @@ public class DrawText extends Filter
 		size = 20;
 	}
 	
+	/**
+	 * FilterString()
+	 * Returns the filter string to be added to the filter chain by a FilterCommand
+	 */
 	@Override
 	public String FilterString()
 	{
@@ -37,7 +47,11 @@ public class DrawText extends Filter
 				+":fontsize="+size+":text='"+text+"':x="+p.x+":y="+p.y+":draw='gt(t,"+startTime+")*lt(t,"+end+")'";
 		return filter;
 	}
-
+	
+	/**
+	 * SaveText()
+	 * Returns a string representing this filter which can be saved to a project file
+	 */
 	@Override
 	public String SaveText() 
 	{
@@ -53,21 +67,34 @@ public class DrawText extends Filter
 		return str;
 	}
 	
+	/**
+	 * ColorToString(Color color)
+	 * @param color the color to be converted
+	 * @return a string representation of color that can be used by avconv (RRGGBBFF)
+	 */
 	public static String ColorToString(Color color)
 	{
 		String str = Integer.toHexString(color.getRGB());
 		String alpha = null;
 		if(str.length() > 6)
 			{
+				//has alpha bits, so is FFRRGGBB
+				//alpha = FF, str = RRGGBB
 				alpha = str.substring(0,2);
 				str = str.substring(2);
 			}
+		//Append necessary 0s
 		while(str.length() < 6)
 			str = "0"+str;
 		if(alpha != null)
 			str+=alpha;
 		return str;
 	}
+	/**
+	 * StringToColor(String str)
+	 * @param str string to be converted: form RRGGBBFF (avconv form)
+	 * @return Color representation of string
+	 */
 	public static Color StringToColor(String str)
 	{
 		String alpha = null;
@@ -81,6 +108,14 @@ public class DrawText extends Filter
 			str = alpha+str;
 		return new Color((int)Long.parseLong(str,16), true);
 	}
+	
+	/**
+	 * Load(Project p, BufferedReader openReader)
+	 * @param p filter's parent project
+	 * @param openReader reader to get lines from
+	 * @return a new DrawText filter read from the lines of the file 
+	 * @throws IOException
+	 */
 	public static DrawText Load(Project p, BufferedReader openReader) throws IOException
 	{
 		String name = openReader.readLine();
