@@ -55,7 +55,7 @@ public class DrawTextPanel extends JPanel
 	private TimePanel timePanel;
 	private Color selectedColor;
 	private Vector<String> fonts;
-	private File fontFile;
+	public File fontFile;
 
 	public DrawTextPanel(TextGUI argParent)
 	{
@@ -101,6 +101,7 @@ public class DrawTextPanel extends JPanel
 			if(!f.isDirectory())
 				fonts.add(f.getName());
 		}
+		DrawText.defaultFont=fonts.firstElement();
 
 		comboFont = new JComboBox<String>(fonts);
 		comboFont.setSelectedIndex(comboFont.getItemCount()-1);

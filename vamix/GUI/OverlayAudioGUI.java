@@ -1,4 +1,5 @@
 package vamix.GUI;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -86,6 +87,8 @@ public class OverlayAudioGUI extends JFrame implements ActionListener {
 
 		overlayBtn = new JButton("Overlay Audio");
 		overlayBtn.addActionListener(this);
+		overlayBtn.setBackground(Color.blue);
+		overlayBtn.setForeground(Color.white);
 		c.weightx = 0.3;
 		c.weighty = 0.3;
 		c.ipadx = 40;

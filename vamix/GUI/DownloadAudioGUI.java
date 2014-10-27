@@ -1,6 +1,7 @@
 package vamix.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -75,6 +76,8 @@ public class DownloadAudioGUI extends JFrame implements ActionListener, Download
 
 		dlBtn = new JButton("Download");
 		dlBtn.addActionListener(this);
+		dlBtn.setBackground(Color.blue);
+		dlBtn.setForeground(Color.white);
 		c.weightx = 0.2;
 		c.ipadx = 0;
 		c.gridx = 2;

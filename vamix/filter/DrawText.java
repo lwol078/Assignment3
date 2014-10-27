@@ -16,12 +16,13 @@ public class DrawText extends Filter
 	public Point p;
 	public Color color;
 	public int size;
+	public static String defaultFont = "";
 	
 	public DrawText(Project project, String name)
 	{
 		super(project, name, Type.DRAWTEXT);
 		text = "wooglywooglywoo";
-		fontName = "";
+		this.fontName = defaultFont;
 		p = new Point(0,0);
 		color = StringToColor("000000");
 		size = 20;

@@ -1,5 +1,6 @@
 package vamix.GUI;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -107,6 +108,8 @@ public class ExtractAudioGUI extends JFrame implements ActionListener {
 		
 		extractBtn = new JButton("Extract Audio");
 		extractBtn.addActionListener(this);
+		extractBtn.setBackground(Color.blue);
+		extractBtn.setForeground(Color.white);
 		c.weightx = 0.5;
 		c.weighty = 0.3;
 		c.ipadx = 50;
@@ -250,6 +253,8 @@ public class ExtractAudioGUI extends JFrame implements ActionListener {
 			
 			advExtractBtn = new JButton("Extract Audio");
 			advExtractBtn.addActionListener(this);
+			advExtractBtn.setBackground(Color.blue);
+			advExtractBtn.setForeground(Color.white);
 			c.weightx = 0.5;
 			c.weighty = 0.2;
 			c.ipadx = 50;
@@ -346,6 +351,8 @@ public class ExtractAudioGUI extends JFrame implements ActionListener {
 			c.gridx = 1;
 			c.gridy = 1;
 			add(extractBtn, c);
+			extractBtn.setBackground(Color.blue);
+			extractBtn.setForeground(Color.white);
 			
 			revalidate();
 			repaint();

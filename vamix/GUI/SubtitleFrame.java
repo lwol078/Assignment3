@@ -1,5 +1,6 @@
 package vamix.GUI;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -112,6 +114,8 @@ public class SubtitleFrame extends JFrame
 			}
 		});
 		btnSave = new JButton("Save subtitles");
+		btnSave.setBackground(Color.blue);
+		btnSave.setForeground(Color.white);
 		btnSave.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) 
@@ -131,10 +135,11 @@ public class SubtitleFrame extends JFrame
 						writer.append("\n\n");
 					}
 					writer.close();
+					JOptionPane.showMessageDialog(null,"Save completed");
 				} 
 				catch (IOException e1) 
 				{
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null,"Save failed");
 					e1.printStackTrace();
 				}
 			}

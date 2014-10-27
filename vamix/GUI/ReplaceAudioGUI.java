@@ -1,4 +1,5 @@
 package vamix.GUI;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -90,6 +91,8 @@ public class ReplaceAudioGUI extends JFrame implements ActionListener {
 
 		replaceBtn = new JButton("Replace Audio");
 		replaceBtn.addActionListener(this);
+		replaceBtn.setBackground(Color.blue);
+		replaceBtn.setForeground(Color.white);
 		c.weightx = 0.3;
 		c.weighty = 0.3;
 		c.ipadx = 40;

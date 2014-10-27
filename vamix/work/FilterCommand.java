@@ -36,20 +36,71 @@ public class FilterCommand
 		}
 	}
 
-	private class DrawCommandWorker extends SwingWorker<Integer,Integer>
+	private class DrawCommandWorker extends SwingWorker<Integer,Void>
 	{
 		@Override
 		protected Integer doInBackground()
 		{
+			gui.setProgress(true);
 			int status = 0;
 			String fileName = project.sourceFile.getName();
-			int i = fileName.lastIndexOf('.');
+			int index = fileName.lastIndexOf('.');
 			//Get extension of file
-			if (i > 0)
-				ext = fileName.substring(i+1);
+			if (index > 0)
+				ext = fileName.substring(index+1);
 
-			status = step1();
-			publish(1);
+			ProcessBuilder builder;
+			
+			List<String> processString = new ArrayList<String>();
+			processString.add("avconv");
+			processString.add("-i");
+			processString.add(project.sourceFile.getAbsolutePath());
+			processString.add("-vf");
+			String str = "";
+			for(int i = 0; i < project.NumFilters(); i++)
+			{	
+
+				if(i == 0)
+					str = "[in]";
+				else
+					str += "[temp"+i+"]";
+				str += project.GetFilter(i).FilterString();
+				if(i < project.NumFilters()-1)
+					str = str+"[temp"+(i+1)+"];";
+				else
+					str += "[out]";
+
+			}
+			processString.add(str);
+			processString.add("-strict");
+			processString.add("experimental");
+			processString.add("-y");
+			processString.add(project.outFile+"."+ext);
+			try 
+			{
+				builder = new ProcessBuilder(processString);
+				Process process = builder.start();
+				/*Deprecated,made progressbar indeterminate instead as slowed computer too much
+				 * BufferedReader bR = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String output = bR.readLine();
+				while(output != null)
+				{
+					if(isCancelled())
+					{
+						process.destroy();
+						break;
+					}
+					output = bR.readLine();
+				}*/
+				status = process.waitFor();
+				process.destroy();
+			}
+			catch(Exception ex)
+			{
+				JOptionPane.showMessageDialog(null,"An error has occured\n"+ex.getMessage());
+				return -1;
+			}
+
 			return status;
 
 
@@ -69,69 +120,41 @@ public class FilterCommand
 			}
 			catch (Exception ex)
 			{}
+			finally
+			{
+				gui.setProgress(false);
+			}
 		}
 		@Override
-		protected void process(List<Integer> chunks)
+		protected void process(List<Void> chunks)
 		{
+			/*Deprecated
 			if(gui != null)
-				gui.setProgress(chunks.get(0)*25);
+			{
+				String[] chunksSplit = chunks.get(0).split(" ");
+				for (int i = 0; i < chunksSplit.length-2; i++) 
+				{
+					if (chunksSplit[i].contains("frame=")) 
+					{
+						int progress = 0;
+						for(int j = i; j < chunksSplit.length; j++)
+						{
+							if(chunksSplit[j].matches("\\d\\d*"))
+								{
+								progress = Integer.parseInt(chunksSplit[j]);
+								break;
+								}
+						}
+						if(progress > 0 && progress < frameCount)
+							gui.setProgress((int)(100.0f*(float)progress/(float)frameCount));
+					}
+				}
+			}*/
 		}
 	}
-	/**	Step 1 of the process
-	 */
-	private int step1()
-	{
-		int status = 0;
-		ProcessBuilder builder;
-		List<String> processString = new ArrayList<String>();
-		processString.add("avconv");
-		processString.add("-i");
-		processString.add(project.sourceFile.getAbsolutePath());
-		processString.add("-vf");
-		String str = "";
-		for(int i = 0; i < project.NumFilters(); i++)
-		{	
-			
-			if(i == 0)
-				str = "[in]";
-			else
-				str += "[temp"+i+"]";
-			str += project.GetFilter(i).FilterString();
-			if(i < project.NumFilters()-1)
-				str = str+"[temp"+(i+1)+"];";
-			else
-				str += "[out]";
-			
-		}
-		processString.add(str);
-		processString.add("-strict");
-		processString.add("experimental");
-		processString.add("-y");
-		processString.add(project.outFile+"."+ext);
-		try 
-		{
-			builder = new ProcessBuilder(processString);
-			builder.redirectError(new File("log.txt"));
-			Process process = builder.start();
-			status = process.waitFor();
-			process.destroy();
-		}
-		catch(Exception ex)
-		{
-			JOptionPane.showMessageDialog(null,"An error has occured\n"+ex.getMessage());
-			return -1;
-		}
-		return status;
-	}
-	
 	public void Execute()
 	{
 		if(worker != null)
 			worker.execute();
-	}
-	
-	public void kill()
-	{
-		
 	}
 }

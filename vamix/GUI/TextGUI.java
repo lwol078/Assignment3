@@ -122,6 +122,8 @@ public class TextGUI extends JFrame implements ActionListener
 
 		btnDo = new JButton("Apply Filters");
 		btnDo.addActionListener(this);
+		btnDo.setBackground(Color.blue);
+		btnDo.setForeground(Color.white);
 
 		progress = new JProgressBar(0,100);
 		progress.setString("");
@@ -271,10 +273,9 @@ public class TextGUI extends JFrame implements ActionListener
 		}
 	}
 
-	public void setProgress(int pct)
+	public void setProgress(boolean bool)
 	{
-		progress.setValue(pct);
-		progress.setString("Processing: " + pct + "%");
+		progress.setIndeterminate(bool);
 	}
 
 	public void MainLayout(GroupLayout layout, boolean showFilter)
