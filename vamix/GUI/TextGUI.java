@@ -10,8 +10,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
-import vamix.filter.Filter;
-import vamix.filter.DrawText;
+import vamix.filter.*;
 import vamix.work.*;
 
 /**	TextGUI
@@ -29,18 +28,20 @@ public class TextGUI extends JFrame implements ActionListener
 	private MainFrame parent;
 	private JPanel mainPanel, sourcePanel, leftPanel;
 	private DrawTextPanel drawTextPanel;
-	private FadePanel fadePanel;
-	
+	private NegatePanel negatePanel;
+
 	private Project currentProject;
 	private JScrollPane filterScroll;
 	private JList<Filter> filterList;
 	private DefaultListModel<Filter> filterModel;
 	private Filter currentFilter;
 	private GroupLayout layout;
+	private boolean viewLock;
 
 	public TextGUI(MainFrame frame, File source)
 	{
 		super("Edit Text");
+		viewLock = false;
 		currentProject = new Project("NewProject");
 		currentFilter = null;
 		currentProject.sourceFile = source;
@@ -71,9 +72,35 @@ public class TextGUI extends JFrame implements ActionListener
 
 		drawTextPanel = new DrawTextPanel(this);
 		tabbedPane.addTab("Text Overlay", drawTextPanel);
-		drawTextPanel = new DrawTextPanel(this);
-		tabbedPane.addTab("Text Overlay", drawTextPanel);
+		negatePanel = new NegatePanel(this);
+		tabbedPane.addTab("Negate", negatePanel);
 
+		tabbedPane.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent arg0)
+			{
+				if(currentFilter != null)
+				{
+					if(tabbedPane.getSelectedComponent() == drawTextPanel)
+					{
+						Filter temp = currentFilter;
+						currentFilter = new DrawText(currentProject,currentFilter.name);
+						currentProject.ReplaceFilter(temp,currentFilter);
+						drawTextPanel.SetValues((DrawText) currentFilter);
+
+					}
+					else if(tabbedPane.getSelectedComponent() == negatePanel)
+					{
+						Filter temp = currentFilter;
+						currentFilter = new Negate(currentProject,currentFilter.name);
+						currentProject.ReplaceFilter(temp,currentFilter);
+						negatePanel.SetValues((Negate) currentFilter);
+					}
+					FilterListUpdate();
+				}
+			}
+
+		});
 
 		setContentPane(mainPanel);
 
@@ -93,7 +120,7 @@ public class TextGUI extends JFrame implements ActionListener
 		btnSave = new JButton("Save Project");
 		btnSave.addActionListener(this);
 
-		btnDo = new JButton("Process");
+		btnDo = new JButton("Apply Filters");
 		btnDo.addActionListener(this);
 
 		progress = new JProgressBar(0,100);
@@ -107,8 +134,7 @@ public class TextGUI extends JFrame implements ActionListener
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) 
 			{
-				currentFilter = filterList.getSelectedValue();
-				Set(currentFilter);
+				SetFilter(filterList.getSelectedValue());
 			}
 		});
 		filterScroll = new JScrollPane(filterList);
@@ -180,7 +206,7 @@ public class TextGUI extends JFrame implements ActionListener
 		}
 		else if(e.getSource() == btnDo)
 		{
-			
+
 			{
 				if(currentProject.sourceFile == null)
 					JOptionPane.showMessageDialog(null,"Select a valid source file");
@@ -224,12 +250,8 @@ public class TextGUI extends JFrame implements ActionListener
 					if(temp != null)
 					{
 						currentProject = temp;
-						filterModel.clear();
-						for(int i = 0 ; i < currentProject.NumFilters(); i++)
-						{
-							filterModel.addElement(currentProject.GetFilter(i));
-							SetSource(currentProject.sourceFile);
-						}
+						SetSource(currentProject.sourceFile);
+						FilterListUpdate();
 					}
 				}
 			}
@@ -238,6 +260,7 @@ public class TextGUI extends JFrame implements ActionListener
 		{
 			String name = JOptionPane.showInputDialog("New filter name:");
 			Filter toAdd = new DrawText(currentProject,name);
+			currentProject.AddFilter(toAdd);
 			filterModel.addElement(toAdd);
 		}
 		else if(e.getSource() == btnRemoveFilter)
@@ -343,27 +366,51 @@ public class TextGUI extends JFrame implements ActionListener
 				);
 	}
 
-	public void Set(Filter f)
+	public void SetFilter(Filter f)
 	{
+		currentFilter = f;
 		if(f == null)
-			//Remove filter part
-			MainLayout(layout,false);
+		{
+			if(!viewLock)
+			{
+				//Remove filter part
+				MainLayout(layout,false);
+			}
+			else
+			{
+				//prevent flickering
+				MainLayout(layout,true);
+			}
+			
+		}
+			
 		else
 		{
 			//Show filter part
 			MainLayout(layout,true);
 			switch(f.type)
 			{
-			case DRAWTEXT: drawTextPanel.SetOptions((DrawText) f); break;
+			case DRAWTEXT: 
+			{
+				drawTextPanel.SetOptions((DrawText) f);
+				tabbedPane.setSelectedComponent(drawTextPanel);
+				break;
+			}
 
+			case NEGATE: 
+			{
+				negatePanel.SetOptions((Negate) f);
+				tabbedPane.setSelectedComponent(negatePanel);
+				break;
+			}
 			}
 		}
-			
-		
+
+
 		pack();
 	}
 
-	private boolean ValidateVideoFile(File file)
+	public static boolean ValidateVideoFile(File file)
 	{
 		try 
 		{
@@ -412,5 +459,24 @@ public class TextGUI extends JFrame implements ActionListener
 		if(name.length() > 15)
 			name = "..."+name.substring(name.length()-12);
 		labelSource.setText(name);
+	}
+
+	public Project GetProject()
+	{
+		return currentProject;
+	}
+	
+	private void FilterListUpdate()
+	{
+		viewLock = true;
+		Filter temp= currentFilter;
+		filterModel.clear();
+		for(int i = 0 ; i < currentProject.NumFilters(); i++)
+		{
+			filterModel.addElement(currentProject.GetFilter(i));
+		}
+		currentFilter = temp;
+		filterList.setSelectedValue(currentFilter, true);
+		viewLock = false;
 	}
 }

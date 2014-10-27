@@ -21,7 +21,7 @@ public class DrawText extends Filter
 	{
 		super(project, name, Type.DRAWTEXT);
 		text = "wooglywooglywoo";
-		fontName = "Ubuntu-R.ttf";
+		fontName = "";
 		p = new Point(0,0);
 		color = StringToColor("000000");
 		size = 20;
@@ -32,7 +32,7 @@ public class DrawText extends Filter
 	{
 		String filter;
 		int end = startTime+duration;
-		filter = "drawtext=fontcolor="+ColorToString(color)+":fontfile=vamix/fonts/"+fontName
+		filter = "drawtext=fontcolor="+ColorToString(color)+":fontfile="+fontName
 				+":fontsize="+size+":text='"+text+"':x="+p.x+":y="+p.y+":draw='gt(t,"+startTime+")*lt(t,"+end+")'";
 		return filter;
 	}

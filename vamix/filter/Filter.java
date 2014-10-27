@@ -7,13 +7,12 @@ public abstract class Filter
 	private Project parent;
 	public String name;
 	public int startTime, duration;
-	public enum Type {DRAWTEXT, FADE, FLIP};
+	public enum Type {DRAWTEXT, /*FADE,*/ NEGATE};
 	public final Type type;
 	
 	public Filter(Project project, String name, Type type)
 	{
 		parent = project;
-		parent.AddFilter(this);
 		this.name = name;
 		startTime = 0;
 		duration = 10;
@@ -37,7 +36,16 @@ public abstract class Filter
 	public static String TimeToString(int time)
 	{
 		//Time must be in hh:mm:ss format
-		return (time / 3600)+":"+((time % 3600)/60)+":"+(time % 60);
+		String hrs = ""+(time/3600);
+		String mins = ""+((time % 3600)/60);
+		String secs = ""+(time % 60);
+		while(hrs.length() < 2)
+			hrs= "0"+hrs;
+		while(mins.length() < 2)
+			mins= "0"+mins;
+		while(secs.length() < 2)
+			secs= "0"+secs;
+		return hrs+":"+mins+":"+secs;
 	}
 	public static int StringToTime(String time)
 	{

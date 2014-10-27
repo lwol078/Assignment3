@@ -6,6 +6,7 @@ import java.util.*;
 import java.awt.Point;
 import vamix.GUI.TextGUI;
 import vamix.filter.Filter;
+import vamix.filter.Project;
 
 /**
  * FilterCommand
@@ -90,11 +91,17 @@ public class FilterCommand
 		String str = "";
 		for(int i = 0; i < project.NumFilters(); i++)
 		{	
-			str += project.GetFilter(i).FilterString();
+			
 			if(i == 0)
-				str = "[in]"+str;
+				str = "[in]";
+			else
+				str += "[temp"+i+"]";
+			str += project.GetFilter(i).FilterString();
 			if(i < project.NumFilters()-1)
-				str = str+", ";
+				str = str+"[temp"+(i+1)+"];";
+			else
+				str += "[out]";
+			
 		}
 		processString.add(str);
 		processString.add("-strict");
@@ -121,5 +128,10 @@ public class FilterCommand
 	{
 		if(worker != null)
 			worker.execute();
+	}
+	
+	public void kill()
+	{
+		
 	}
 }

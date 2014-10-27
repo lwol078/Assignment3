@@ -10,6 +10,7 @@ import javax.swing.event.*;
 
 import vamix.work.*;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 
 /** Mainframe
  *  The main frame class for the vamix. It contains a menu to access the editing functions,
@@ -20,7 +21,7 @@ public class MainFrame extends JFrame implements ActionListener
 	private JMenuBar menuBar;
 
     private JMenu fileMenu,videoMenu,downloadMenu, audioMenu;
-    private JMenuItem openItem,textItem, downloadAudio, downloadVideo, extractAudio, replaceAudio, overlayAudio;
+    private JMenuItem openItem,filterItem, subtitleItem, downloadAudio, downloadVideo, extractAudio, replaceAudio, overlayAudio;
 
     private JDesktopPane desktop;
     private JPanel playerPanel;
@@ -29,6 +30,7 @@ public class MainFrame extends JFrame implements ActionListener
     private EmbeddedMediaPlayerComponent mediaPlayerComponent;
     private File currentFile;
     private TextGUI textGUI;
+    private SubtitleFrame subtitles;
 
     /** Constructor
     *   Sets everything up to run
@@ -40,6 +42,7 @@ public class MainFrame extends JFrame implements ActionListener
         mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
         currentFile = null;
         textGUI = null;
+        subtitles = null;
 
 		setLocation(100, 100);
         setSize(1050, 600);
@@ -54,17 +57,6 @@ public class MainFrame extends JFrame implements ActionListener
                 {
                     mediaPlayerComponent.release();
                 }
-                /*Causes errors for some reason
-                /*public void windowOpened(WindowEvent e)
-        		{
-
-        			Dimension d = getSize();
-                    int width = (int)d.getWidth();
-                    int height = (int)d.getHeight();
-                    playerPanel.setBounds(0, 0, width, height-10);
-                    playOptionsPanel.setBounds(0, height-10, width, 80);
-                    desktop.moveToBack( playerPanel);
-        		}*/
             });
         addComponentListener(new ComponentAdapter()
             {
@@ -141,9 +133,13 @@ public class MainFrame extends JFrame implements ActionListener
                 "Menu option for video functionality");
         menuBar.add(videoMenu);
 
-        textItem = new JMenuItem("Add Text to Video");
-        textItem.addActionListener(this);
-        videoMenu.add(textItem);
+        filterItem = new JMenuItem("Add Filters to Video");
+        filterItem.addActionListener(this);
+        videoMenu.add(filterItem);
+        
+        subtitleItem = new JMenuItem("Add Subtitles to Video");
+        subtitleItem.addActionListener(this);
+        videoMenu.add(subtitleItem);
 
         setJMenuBar(menuBar);
 
@@ -181,7 +177,7 @@ public class MainFrame extends JFrame implements ActionListener
         {
         	new OverlayAudioGUI(this);
         }
-        else if (e.getSource() == textItem)
+        else if (e.getSource() == filterItem)
         {
             if(textGUI == null)
             {
@@ -195,5 +191,26 @@ public class MainFrame extends JFrame implements ActionListener
                 });
             }
         }
+        else if (e.getSource() == subtitleItem)
+        {
+        	if(!TextGUI.ValidateVideoFile(currentFile))
+        			JOptionPane.showMessageDialog(this, "Begin playing a track to be able to add subtitles");
+        	else if(subtitles == null)
+            {
+                subtitles = new SubtitleFrame(this,currentFile);
+                subtitles.addWindowListener(new WindowAdapter()
+                {
+                    public void windowClosing(WindowEvent e)
+                    {
+                        subtitles = null;
+                    }
+                });
+            }
+        }
+    }
+    
+    public MediaPlayer GetMediaPlayer()
+    {
+    	return mediaPlayerComponent.getMediaPlayer();
     }
 }

@@ -22,6 +22,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -44,13 +45,14 @@ import vamix.filter.DrawText;
 public class DrawTextPanel extends JPanel 
 {
 	private TextGUI parent;
-	private JLabel labelFont,labelColor,labelX,labelY,labelText,labelTime,labelDuration, labelSize;
+	private JLabel labelFont,labelColor,labelX,labelY,labelText, labelSize;
 	private JComboBox<String> comboFont;
-	private JSpinner spinX, spinY, spinHr, spinMin, spinSec, spinDur, spinSize;
+	private JSpinner spinX, spinY, spinSize;
 	private JTextField text;
 	private JButton btnColor;
 
-	private JPanel formatPanel, positionPanel, timePanel;
+	private JPanel formatPanel, positionPanel;
+	private TimePanel timePanel;
 	private Color selectedColor;
 	private Vector<String> fonts;
 	private File fontFile;
@@ -63,7 +65,7 @@ public class DrawTextPanel extends JPanel
 
 		formatPanel = new JPanel();
 		positionPanel = new JPanel();
-		timePanel = new JPanel();
+		timePanel = new TimePanel(parent);
 
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
@@ -71,8 +73,6 @@ public class DrawTextPanel extends JPanel
 		formatPanel.setLayout(formatLayout);
 		GroupLayout posLayout = new GroupLayout(positionPanel);
 		positionPanel.setLayout(posLayout);
-		GroupLayout timeLayout = new GroupLayout(timePanel);
-		timePanel.setLayout(timeLayout);
 
 		labelFont = new JLabel("Font:");
 
@@ -81,9 +81,25 @@ public class DrawTextPanel extends JPanel
 		if(fontFile.getName().endsWith(".jar"))
 			fontFile = new File(fontFile.getParent());
 		fontFile = new File(fontFile.getAbsolutePath()+"/vamix/fonts");
+		while(!fontFile.exists())
+		{
+			JOptionPane.showMessageDialog(null,"Fonts not found. Please select a font in the file that contains the fonts you wish to use.");
+			JFileChooser jFC = new JFileChooser();
+			int returnVal = jFC.showOpenDialog(this);
+			if(returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				fontFile = jFC.getSelectedFile().getParentFile();
+			}
+			else
+			{
+				parent.dispose();
+				break;
+			}	
+		}
 		for(File f : fontFile.listFiles())
 		{
-			fonts.add(f.getName());
+			if(!f.isDirectory())
+				fonts.add(f.getName());
 		}
 
 		comboFont = new JComboBox<String>(fonts);
@@ -94,7 +110,7 @@ public class DrawTextPanel extends JPanel
 			public void itemStateChanged(ItemEvent arg0) 
 			{
 
-				Filter().fontName = (String)comboFont.getSelectedItem();
+				Filter().fontName = fontFile.getAbsolutePath()+"/"+comboFont.getSelectedItem();
 			}
 		});
 
@@ -122,7 +138,14 @@ public class DrawTextPanel extends JPanel
 		labelSize = new JLabel("Size:");
 		spinSize = new JSpinner(new SpinnerNumberModel(10,1,50,1));
 		spinSize.setMaximumSize(new Dimension(30,20));
-
+		spinSize.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent arg0) 
+			{
+				Filter().size = (int)spinSize.getValue();
+			}
+		});
+		
 		labelX = new JLabel("x:");
 		spinX = new JSpinner(new SpinnerNumberModel(0,0,100,1));
 		spinX.setMaximumSize(new Dimension(30,20));
@@ -170,45 +193,11 @@ public class DrawTextPanel extends JPanel
 		text.setForeground(selectedColor);
 		text.setBackground(Inverse(selectedColor));
 
-		labelTime = new JLabel("Time:");
-		ChangeListener timeListener = new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent arg0) 
-			{
-				int hr = (int)spinHr.getValue();
-				int min = (int)spinHr.getValue();
-				int sec = (int)spinHr.getValue();
-				Filter().startTime = vamix.filter.Filter.ToSeconds(hr, min, sec);}
-		};
-		spinHr = new JSpinner(new SpinnerNumberModel(0,0,60,1));
-		spinHr.setMaximumSize(new Dimension(50,20));
-		spinHr.addChangeListener(timeListener);
-		spinMin = new JSpinner(new SpinnerNumberModel(0,0,60,1));
-		spinMin.setMaximumSize(new Dimension(50,20));
-		spinMin.addChangeListener(timeListener);
-		spinSec = new JSpinner(new SpinnerNumberModel(0,0,60,1));
-		spinSec.setMaximumSize(new Dimension(50,20));
-		spinSec.addChangeListener(timeListener);
-
-		labelDuration = new JLabel("Duration (s):");
-		spinDur = new JSpinner(new SpinnerNumberModel(0,0,null,1));
-		spinDur.setMaximumSize(new Dimension(50,20));
-		spinDur.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent arg0) 
-			{
-				Filter().duration = (int)spinDur.getValue();
-			}
-		});
-
 		//Format panel layout
 		FormatLayout(formatLayout);
 
 		//Position panel layout
 		PositionLayout(posLayout);
-
-		//Time panel layout
-		TimeLayout(timeLayout);
 
 		//Format overall panel
 		Layout(layout);
@@ -273,46 +262,6 @@ public class DrawTextPanel extends JPanel
 				);
 	}
 
-	public void TimeLayout(GroupLayout layout)
-	{
-		JLabel colon1 = new JLabel(":");
-		JLabel colon2 = new JLabel(":");
-		layout.setAutoCreateGaps(true);
-		layout.setAutoCreateContainerGaps(true);
-		layout.setHorizontalGroup(
-				layout.createSequentialGroup()
-				.addGroup(layout.createParallelGroup()
-						.addComponent(labelTime)
-						.addComponent(labelDuration)
-						)
-						.addComponent(spinHr)
-						.addComponent(colon1)
-						.addComponent(spinMin)
-						.addComponent(colon2)
-						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.CENTER)
-								.addComponent(spinSec)
-								.addComponent(spinDur)
-								)
-
-				);
-		layout.setVerticalGroup(
-				layout.createSequentialGroup()
-				.addGroup(layout.createParallelGroup()
-						.addComponent(labelTime)
-						.addComponent(spinHr)
-						.addComponent(colon1)
-						.addComponent(spinMin)
-						.addComponent(colon2)
-						.addComponent(spinSec)
-						)
-						.addGroup(layout.createParallelGroup()
-								.addComponent(labelDuration)
-								.addComponent(spinDur)
-								)
-
-				);
-	}
-
 	public void Layout(GroupLayout layout)
 	{
 		layout.setAutoCreateGaps(true);
@@ -345,12 +294,12 @@ public class DrawTextPanel extends JPanel
 			text.setForeground(selectedColor);
 			text.setBackground(Inverse(selectedColor));
 		}
-		spinHr.setValue(f.startTime/3600);
-		spinMin.setValue((f.startTime%3600)/60);
-		spinSec.setValue(f.startTime%60);
-		spinDur.setValue(f.duration);
+		
+		timePanel.Update(f.startTime, f.duration);
+		
 		spinSize.setValue(f.size);
-		comboFont.setSelectedItem(f.fontName);
+		String str = new File(f.fontName).getName();
+		comboFont.setSelectedItem(str);
 	}
 	public DrawText Filter()
 	{
@@ -368,5 +317,22 @@ public class DrawTextPanel extends JPanel
 			return new Color(0,0,0);
 		return new Color(rgb[0],rgb[1],rgb[2]);
 	}
-
+	
+	/**
+	 * Sets the filter to the values on this panel
+	 * @param f
+	 */
+	public void SetValues(DrawText d)
+	{
+		d.text = text.getText();
+		d.p = new Point((int)spinX.getValue(), (int)spinY.getValue());
+		d.fontName = fontFile.getAbsolutePath()+"/"+comboFont.getSelectedItem();
+		d.color = selectedColor;
+		d.size = (int)spinSize.getValue();
+		int hr = (int)timePanel.spinHr.getValue();
+		int min = (int)timePanel.spinMin.getValue();
+		int sec = (int)timePanel.spinSec.getValue();
+		d.startTime = vamix.filter.Filter.ToSeconds(hr, min, sec);
+		d.duration = (int)timePanel.spinDur.getValue();
+	}
 }
